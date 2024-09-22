@@ -2,8 +2,8 @@ import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { FormService } from './form.service';
 import { WebResponse } from '../model/web.model';
 import { FormResponse, FormSaveRequest } from '../model/form.model';
-import { AuthUser } from '../common/auth-user.decorator';
 import { User } from '@prisma/client';
+import { Admin } from '../common/admin.decorator';
 
 @Controller('/api/v1/forms')
 export class FormController {
@@ -12,7 +12,7 @@ export class FormController {
     @Post()
     @HttpCode(200)
     async save(
-        @AuthUser() user: User,
+        @Admin() user: User,
         @Body() request: FormSaveRequest,
     ): Promise<WebResponse<FormResponse>> {
         const result = await this.formService.saveForm(request, user);

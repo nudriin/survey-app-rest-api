@@ -8,6 +8,20 @@ export class TestService {
     constructor(private prismaService: PrismaService) {}
 
     async deleteUser() {
+        const user = await this.prismaService.user.findFirst({
+            where: {
+                email: 'test@test.com',
+            },
+        });
+
+        if (user) {
+            await this.prismaService.form.deleteMany({
+                where: {
+                    userId: user.id,
+                },
+            });
+        }
+
         await this.prismaService.user.deleteMany({
             where: {
                 email: 'test@test.com',
@@ -16,6 +30,20 @@ export class TestService {
     }
 
     async deleteSuperAdmin() {
+        const user = await this.prismaService.user.findFirst({
+            where: {
+                email: 'test@superadmin.com',
+            },
+        });
+
+        if (user) {
+            await this.prismaService.form.deleteMany({
+                where: {
+                    userId: user.id,
+                },
+            });
+        }
+
         await this.prismaService.user.deleteMany({
             where: {
                 email: 'test@superadmin.com',

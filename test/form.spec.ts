@@ -21,18 +21,28 @@ describe('FormController', () => {
 
     describe('POST /api/v1/forms', () => {
         let token: string;
+        let tokenUser: string;
         beforeEach(async () => {
+            await testService.deleteSuperAdmin();
+            await testService.createSuperAdmin();
             await testService.deleteUser();
             await testService.createUser();
             await testService.deleteForm();
-            const response = await request(app.getHttpServer())
+            let response = await request(app.getHttpServer())
                 .post('/api/v1/users/login')
                 .send({
                     email: 'test@superadmin.com',
                     password: 'test',
                 });
-
             token = response.body.data.token;
+
+            response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@test.com',
+                    password: 'test',
+                });
+            tokenUser = response.body.data.token;
         });
         it('should be rejected if user not login', async () => {
             const response = await request(app.getHttpServer())
@@ -45,6 +55,21 @@ describe('FormController', () => {
             console.info(response.body);
 
             expect(response.status).toBe(401);
+            expect(response.body.errors).toBeDefined();
+        });
+
+        it('should be rejected if user not admin', async () => {
+            const response = await request(app.getHttpServer())
+                .post('/api/v1/forms')
+                .set('Authorization', `Bearer ${tokenUser}`)
+                .send({
+                    name: 'test',
+                    description: 'test',
+                });
+
+            console.info(response.body);
+
+            expect(response.status).toBe(403);
             expect(response.body.errors).toBeDefined();
         });
 
