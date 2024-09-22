@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
 import { FormResponse, FormSaveRequest } from '../model/form.model';
@@ -33,5 +33,19 @@ export class FormService {
         });
 
         return form;
+    }
+
+    async findAllForm(user: User): Promise<FormResponse[]> {
+        const forms = await this.prismaService.form.findMany({
+            where: {
+                userId: user.id,
+            },
+        });
+
+        if (!forms) {
+            throw new HttpException('form not found', 404);
+        }
+
+        return forms;
     }
 }

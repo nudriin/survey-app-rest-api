@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { FormService } from './form.service';
 import { WebResponse } from '../model/web.model';
 import { FormResponse, FormSaveRequest } from '../model/form.model';
@@ -16,6 +16,16 @@ export class FormController {
         @Body() request: FormSaveRequest,
     ): Promise<WebResponse<FormResponse>> {
         const result = await this.formService.saveForm(request, user);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get()
+    @HttpCode(200)
+    async findAll(@Admin() user: User): Promise<WebResponse<FormResponse[]>> {
+        const result = await this.formService.findAllForm(user);
 
         return {
             data: result,
