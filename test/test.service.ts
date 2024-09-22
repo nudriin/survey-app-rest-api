@@ -47,4 +47,12 @@ export class TestService {
 
         return user;
     }
+
+    async deleteForm() {
+        await this.prismaService.form.deleteMany({
+            where: {
+                name: 'test',
+            },
+        });
+    }
 }
