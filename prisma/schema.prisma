@@ -42,7 +42,7 @@ model Form {
   visit Int @default(0)
   submissions Int @default(0)
 
-  shareURL String
+  shareURL String?
   formDetails FormDetails[]
 
   userId Int
