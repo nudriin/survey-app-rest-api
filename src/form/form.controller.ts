@@ -1,4 +1,12 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpCode,
+    Param,
+    ParseIntPipe,
+    Post,
+} from '@nestjs/common';
 import { FormService } from './form.service';
 import { WebResponse } from '../model/web.model';
 import { FormResponse, FormSaveRequest } from '../model/form.model';
@@ -26,6 +34,18 @@ export class FormController {
     @HttpCode(200)
     async findAll(@Admin() user: User): Promise<WebResponse<FormResponse[]>> {
         const result = await this.formService.findAllForm(user);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get('/:formId')
+    @HttpCode(200)
+    async findById(
+        @Param('formId', ParseIntPipe) formId: number,
+    ): Promise<WebResponse<FormResponse>> {
+        const result = await this.formService.findByIdForm(formId);
 
         return {
             data: result,

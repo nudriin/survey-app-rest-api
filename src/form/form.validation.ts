@@ -7,4 +7,6 @@ export class FormValidation {
         }),
         description: z.string().optional(),
     });
+
+    static readonly FIND_ID = z.number().min(1);
 }

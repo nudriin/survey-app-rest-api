@@ -48,4 +48,23 @@ export class FormService {
 
         return forms;
     }
+
+    async findByIdForm(formId: number): Promise<FormResponse> {
+        const validFormId: number = this.validationService.validate(
+            FormValidation.FIND_ID,
+            formId,
+        );
+
+        const form = await this.prismaService.form.findUnique({
+            where: {
+                id: validFormId,
+            },
+        });
+
+        if (!form) {
+            throw new HttpException('form not found', 404);
+        }
+
+        return form;
+    }
 }

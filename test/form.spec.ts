@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { TestService } from './test.service';
 import { TestModule } from './test.module';
+import { FormResponse } from '../src/model/form.model';
 describe('FormController', () => {
     let app: INestApplication;
     let testService: TestService;
@@ -120,6 +121,59 @@ describe('FormController', () => {
 
             expect(response.status).toBe(200);
             expect(response.body.data).toBeDefined();
+        });
+    });
+
+    describe('GET /api/v1/forms/:formId', () => {
+        let token: string;
+        let form: FormResponse;
+        beforeEach(async () => {
+            await testService.deleteSuperAdmin();
+            await testService.createSuperAdmin();
+            let response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+
+            response = await request(app.getHttpServer())
+                .post('/api/v1/forms')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    name: 'test',
+                    description: 'test',
+                });
+
+            form = response.body.data;
+        });
+
+        it('should be fail get form by id if form id is not found', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/forms/${form.id + 1}`,
+            );
+            console.info(response.body);
+
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('form not found');
+        });
+
+        it('should be success get form by id', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/forms/${form.id}`,
+            );
+            console.info(response.body);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data.name).toBe(form.name);
+            expect(response.body.data.description).toBe(form.description);
+            expect(response.body.data.id).toBe(form.id);
+            expect(response.body.data.userId).toBe(form.userId);
+        });
+
+        afterEach(async () => {
+            await testService.deleteForm();
         });
     });
 });
