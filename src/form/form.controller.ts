@@ -5,11 +5,16 @@ import {
     HttpCode,
     Param,
     ParseIntPipe,
+    Patch,
     Post,
 } from '@nestjs/common';
 import { FormService } from './form.service';
 import { WebResponse } from '../model/web.model';
-import { FormResponse, FormSaveRequest } from '../model/form.model';
+import {
+    FormResponse,
+    FormSaveRequest,
+    FormUpdateRequest,
+} from '../model/form.model';
 import { User } from '@prisma/client';
 import { Admin } from '../common/admin.decorator';
 
@@ -46,6 +51,19 @@ export class FormController {
         @Param('formId', ParseIntPipe) formId: number,
     ): Promise<WebResponse<FormResponse>> {
         const result = await this.formService.findByIdForm(formId);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Patch()
+    @HttpCode(200)
+    async update(
+        @Admin() user: User,
+        @Body() request: FormUpdateRequest,
+    ): Promise<WebResponse<FormResponse>> {
+        const result = await this.formService.updateForm(user, request);
 
         return {
             data: result,

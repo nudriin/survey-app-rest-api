@@ -3,6 +3,12 @@ export class FormSaveRequest {
     description?: string;
 }
 
+export class FormUpdateRequest {
+    id: number;
+    content?: string;
+    published?: boolean;
+}
+
 export class FormResponse {
     id: number;
     createdAt: Date;

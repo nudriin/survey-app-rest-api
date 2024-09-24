@@ -1,7 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
-import { FormResponse, FormSaveRequest } from '../model/form.model';
+import {
+    FormResponse,
+    FormSaveRequest,
+    FormUpdateRequest,
+} from '../model/form.model';
 import { User } from '@prisma/client';
 import { FormValidation } from './form.validation';
 import { v4 as uuid } from 'uuid';
@@ -67,6 +71,50 @@ export class FormService {
         if (!form) {
             throw new HttpException('form not found', 404);
         }
+
+        return form;
+    }
+
+    async updateForm(
+        user: User,
+        request: FormUpdateRequest,
+    ): Promise<FormResponse> {
+        const validRequest: FormUpdateRequest = this.validationService.validate(
+            FormValidation.UPDATE,
+            request,
+        ) as FormUpdateRequest;
+
+        const findForm = await this.prismaService.form.findFirst({
+            where: {
+                AND: [
+                    {
+                        id: validRequest.id,
+                    },
+                    {
+                        userId: user.id,
+                    },
+                ],
+            },
+        });
+
+        if (!findForm) {
+            throw new HttpException('form not found', 404);
+        }
+
+        if (validRequest.content) {
+            findForm.content = validRequest.content;
+        }
+
+        if (validRequest.published) {
+            findForm.published = validRequest.published;
+        }
+
+        const form = await this.prismaService.form.update({
+            where: {
+                id: validRequest.id,
+            },
+            data: findForm,
+        });
 
         return form;
     }

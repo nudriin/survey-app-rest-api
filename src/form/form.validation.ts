@@ -9,4 +9,10 @@ export class FormValidation {
     });
 
     static readonly FIND_ID = z.number().min(1);
+
+    static readonly UPDATE = z.object({
+        id: z.number().min(1),
+        content: z.string().optional(),
+        published: z.boolean().optional(),
+    });
 }

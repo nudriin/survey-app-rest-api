@@ -176,4 +176,101 @@ describe('FormController', () => {
             await testService.deleteForm();
         });
     });
+
+    describe('PATCH /api/v1/forms', () => {
+        let token: string;
+        let form: FormResponse;
+        beforeEach(async () => {
+            await testService.deleteSuperAdmin();
+            await testService.createSuperAdmin();
+            let response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+
+            response = await request(app.getHttpServer())
+                .post('/api/v1/forms')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    name: 'test',
+                    description: 'test',
+                });
+
+            form = response.body.data;
+        });
+
+        it('should be failed update form if user id is wrong', async () => {
+            const response = await request(app.getHttpServer())
+                .patch(`/api/v1/forms`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    id: form.id + 1,
+                    content: JSON.stringify([
+                        {
+                            extraAttr: {
+                                helperText:
+                                    'Deskripsi, ringkasan, dan lain-lain',
+                                label: 'Name',
+                                placeholder: 'Masukan data...',
+                                required: false,
+                            },
+                            id: '5957',
+                            type: 'TextField',
+                        },
+                    ]),
+                });
+            console.info(response.body);
+
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBeDefined();
+        });
+
+        it('should be success update form', async () => {
+            const response = await request(app.getHttpServer())
+                .patch(`/api/v1/forms`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    id: form.id,
+                    content: JSON.stringify([
+                        {
+                            extraAttr: {
+                                helperText:
+                                    'Deskripsi, ringkasan, dan lain-lain',
+                                label: 'Name',
+                                placeholder: 'Masukan data...',
+                                required: false,
+                            },
+                            id: '5957',
+                            type: 'TextField',
+                        },
+                    ]),
+                    published: true,
+                });
+            console.info(response.body);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data.name).toBe(form.name);
+            expect(response.body.data.description).toBe(form.description);
+            expect(response.body.data.id).toBe(form.id);
+            expect(response.body.data.userId).toBe(form.userId);
+        });
+
+        afterEach(async () => {
+            await testService.deleteForm();
+        });
+    });
 });
+
+// {
+//     extraAttr :{
+// helperText: "Deskripsi, ringkasan, dan lain-lain",
+// label: "Name",
+// placeholder: "Masukan data...",
+// required: false,
+// },
+// id: "5957",
+// type: "TextField"
+// }
