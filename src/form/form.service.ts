@@ -118,4 +118,34 @@ export class FormService {
 
         return form;
     }
+
+    async findByUrlForm(shareURL: string): Promise<FormResponse> {
+        const validShareURL: string = this.validationService.validate(
+            FormValidation.FIND_URL,
+            shareURL,
+        );
+
+        const findForm = await this.prismaService.form.findFirst({
+            where: {
+                shareURL: validShareURL,
+            },
+        });
+
+        if (!findForm) {
+            throw new HttpException('form not found', 404);
+        }
+
+        const form = await this.prismaService.form.update({
+            where: {
+                id: findForm.id,
+            },
+            data: {
+                visit: {
+                    increment: 1,
+                },
+            },
+        });
+
+        return form;
+    }
 }

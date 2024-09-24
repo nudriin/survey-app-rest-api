@@ -69,4 +69,16 @@ export class FormController {
             data: result,
         };
     }
+
+    @Get('/url/:shareURL')
+    @HttpCode(200)
+    async findByUrl(
+        @Param('shareURL') shareURL: string,
+    ): Promise<WebResponse<FormResponse>> {
+        const result = await this.formService.findByUrlForm(shareURL);
+
+        return {
+            data: result,
+        };
+    }
 }

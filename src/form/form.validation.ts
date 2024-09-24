@@ -15,4 +15,6 @@ export class FormValidation {
         content: z.string().optional(),
         published: z.boolean().optional(),
     });
+
+    static readonly FIND_URL = z.string().min(1);
 }
