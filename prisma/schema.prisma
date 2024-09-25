@@ -58,7 +58,7 @@ model FormDetails{
   formId Int
   form Form @relation(fields: [formId], references: [id])
 
-  content String
+  content String @db.Text
   
   @@map("form_details")
 }
