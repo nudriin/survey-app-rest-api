@@ -58,7 +58,7 @@ export class FormService {
         return forms;
     }
 
-    async findByIdForm(formId: number): Promise<FormResponse> {
+    async findByIdForm(formId: number): Promise<FormDetailsResponse> {
         const validFormId: number = this.validationService.validate(
             FormValidation.FIND_ID,
             formId,
@@ -67,6 +67,9 @@ export class FormService {
         const form = await this.prismaService.form.findUnique({
             where: {
                 id: validFormId,
+            },
+            include: {
+                formDetails: true,
             },
         });
 

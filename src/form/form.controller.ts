@@ -51,7 +51,7 @@ export class FormController {
     @HttpCode(200)
     async findById(
         @Param('formId', ParseIntPipe) formId: number,
-    ): Promise<WebResponse<FormResponse>> {
+    ): Promise<WebResponse<FormDetailsResponse>> {
         const result = await this.formService.findByIdForm(formId);
 
         return {
