@@ -11,6 +11,8 @@ import {
 import { FormService } from './form.service';
 import { WebResponse } from '../model/web.model';
 import {
+    FormDetailsRequest,
+    FormDetailsResponse,
     FormResponse,
     FormSaveRequest,
     FormUpdateRequest,
@@ -76,6 +78,18 @@ export class FormController {
         @Param('shareURL') shareURL: string,
     ): Promise<WebResponse<FormResponse>> {
         const result = await this.formService.findByUrlForm(shareURL);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Patch('/url')
+    @HttpCode(200)
+    async updateDetails(
+        @Body() request: FormDetailsRequest,
+    ): Promise<WebResponse<FormDetailsResponse>> {
+        const result = await this.formService.updateFormDetails(request);
 
         return {
             data: result,

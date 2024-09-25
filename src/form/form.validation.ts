@@ -14,6 +14,12 @@ export class FormValidation {
         id: z.number().min(1),
         content: z.string().optional(),
         published: z.boolean().optional(),
+        shareURL: z.string().min(1).optional(),
+    });
+
+    static readonly UPDATE_DETAILS = z.object({
+        shareURL: z.string().min(1),
+        content: z.string().optional(),
     });
 
     static readonly FIND_URL = z.string().min(1);

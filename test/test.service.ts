@@ -15,11 +15,25 @@ export class TestService {
         });
 
         if (user) {
-            await this.prismaService.form.deleteMany({
+            const form = await this.prismaService.form.findFirst({
                 where: {
                     userId: user.id,
                 },
             });
+
+            if (form) {
+                await this.prismaService.formDetails.deleteMany({
+                    where: {
+                        formId: form.id,
+                    },
+                });
+
+                await this.prismaService.form.deleteMany({
+                    where: {
+                        id: form.id,
+                    },
+                });
+            }
         }
 
         await this.prismaService.user.deleteMany({
@@ -77,10 +91,24 @@ export class TestService {
     }
 
     async deleteForm() {
-        await this.prismaService.form.deleteMany({
+        const form = await this.prismaService.form.findFirst({
             where: {
                 name: 'test',
             },
         });
+
+        if (form) {
+            await this.prismaService.formDetails.deleteMany({
+                where: {
+                    formId: form.id,
+                },
+            });
+
+            await this.prismaService.form.deleteMany({
+                where: {
+                    name: 'test',
+                },
+            });
+        }
     }
 }
