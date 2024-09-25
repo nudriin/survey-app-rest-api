@@ -35,14 +35,14 @@ model Form {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
   published Boolean @default(false)
-  name String
-  description String @default("")
+  name String @db.VarChar(225)
+  description String @default("") @db.Text
   content String @default("[]") @db.Text
 
   visit Int @default(0)
   submissions Int @default(0)
 
-  shareURL String?
+  shareURL String? @db.Text
   formDetails FormDetails[]
 
   userId Int
