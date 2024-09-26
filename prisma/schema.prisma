@@ -14,14 +14,15 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  email String @unique
-  name String
-  password String
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
   createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
-  role     Role   @default(USER)
+  role      Role     @default(USER)
 
   form Form[]
+
   @@map("users")
 }
 
@@ -32,17 +33,17 @@ enum Role {
 }
 
 model Form {
-  id Int @id @default(autoincrement())
-  createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
-  published Boolean @default(false)
-  name String @db.VarChar(225)
-  description String @default("") @db.Text
-  content String @default("[]") @db.Text
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
+  published   Boolean  @default(false)
+  name        String   @db.VarChar(225)
+  description String   @db.Text
+  content     String   @db.Text
 
-  visit Int @default(0)
+  visit       Int @default(0)
   submissions Int @default(0)
 
-  shareURL String? @db.Text
+  shareURL    String?       @db.Text
   formDetails FormDetails[]
 
   userId Int
@@ -52,13 +53,13 @@ model Form {
   @@map("forms")
 }
 
-model FormDetails{
-  id Int @id @default(autoincrement())
+model FormDetails {
+  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
-  formId Int
-  form Form @relation(fields: [formId], references: [id])
+  formId    Int
+  form      Form     @relation(fields: [formId], references: [id])
 
   content String @db.Text
-  
+
   @@map("form_details")
 }

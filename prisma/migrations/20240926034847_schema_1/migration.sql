@@ -16,12 +16,12 @@ CREATE TABLE `forms` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `published` BOOLEAN NOT NULL DEFAULT false,
-    `name` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NOT NULL DEFAULT '',
-    `content` VARCHAR(191) NOT NULL DEFAULT '[]',
+    `name` VARCHAR(225) NOT NULL,
+    `description` TEXT NOT NULL,
+    `content` TEXT NOT NULL,
     `visit` INTEGER NOT NULL DEFAULT 0,
     `submissions` INTEGER NOT NULL DEFAULT 0,
-    `shareURL` VARCHAR(191) NOT NULL,
+    `shareURL` TEXT NULL,
     `userId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -32,7 +32,7 @@ CREATE TABLE `form_details` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `createdAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `formId` INTEGER NOT NULL,
-    `content` VARCHAR(191) NOT NULL,
+    `content` TEXT NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

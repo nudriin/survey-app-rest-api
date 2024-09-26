@@ -29,12 +29,14 @@ export class FormService {
             request,
         ) as FormSaveRequest;
 
+        const content = '[]';
         const form = await this.prismaService.form.create({
             data: {
                 name: validRequest.name,
                 description: validRequest.description,
                 userId: user.id,
                 shareURL: uuid(),
+                content: content,
             },
         });
 
