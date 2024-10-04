@@ -8,13 +8,14 @@ import {
     FormSaveRequest,
     FormTotalStatistics,
     FormUpdateRequest,
+    MonthlySubmissionCount,
     SubmissionDistributionByForm,
 } from '../model/form.model';
 import { User } from '@prisma/client';
 import { FormValidation } from './form.validation';
 import { v4 as uuid } from 'uuid';
 import { toZonedTime } from 'date-fns-tz';
-import { endOfMonth, startOfMonth } from 'date-fns';
+import { endOfMonth, startOfMonth, subDays } from 'date-fns';
 
 @Injectable()
 export class FormService {
@@ -294,6 +295,41 @@ export class FormService {
         const mappedData = data.map((value) => {
             return {
                 form: value.form,
+                count: Number(value.count),
+            };
+        });
+
+        return mappedData;
+    }
+
+    async findMonthlySubmissionCount(
+        user: User,
+    ): Promise<MonthlySubmissionCount[]> {
+        const countUser = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (countUser === 0) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const endDate = new Date();
+        const startDate = subDays(endDate, 30);
+        const data = await this.prismaService.$queryRaw<
+            { date: Date | undefined; count: number | null }[]
+        >`
+        SELECT DATE(createdAt) as date, COUNT(*) as count
+        FROM form_details
+        WHERE createdAt >= ${startDate} AND createdAt <= ${endDate}
+        GROUP BY DATE(createdAt)
+        ORDER BY date ASC
+        `;
+
+        const mappedData = data.map((value) => {
+            return {
+                date: value.date,
                 count: Number(value.count),
             };
         });

@@ -17,6 +17,7 @@ import {
     FormSaveRequest,
     FormTotalStatistics,
     FormUpdateRequest,
+    MonthlySubmissionCount,
     SubmissionDistributionByForm,
 } from '../model/form.model';
 import { User } from '@prisma/client';
@@ -117,6 +118,18 @@ export class FormController {
     ): Promise<WebResponse<SubmissionDistributionByForm[]>> {
         const result =
             await this.formService.findSubmissionDistributionByForm(user);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get('/all/monthly-submission-count')
+    @HttpCode(200)
+    async findMonthlySubmissionCount(
+        @Admin() user: User,
+    ): Promise<WebResponse<MonthlySubmissionCount[]>> {
+        const result = await this.formService.findMonthlySubmissionCount(user);
 
         return {
             data: result,

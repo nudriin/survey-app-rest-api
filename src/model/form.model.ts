@@ -53,3 +53,8 @@ export class SubmissionDistributionByForm {
     form: string;
     count: number;
 }
+
+export class MonthlySubmissionCount {
+    date: Date;
+    count: number;
+}
