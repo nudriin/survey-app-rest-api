@@ -15,6 +15,7 @@ import {
     FormDetailsResponse,
     FormResponse,
     FormSaveRequest,
+    FormTotalStatistics,
     FormUpdateRequest,
 } from '../model/form.model';
 import { User } from '@prisma/client';
@@ -90,6 +91,18 @@ export class FormController {
         @Body() request: FormDetailsRequest,
     ): Promise<WebResponse<FormDetailsResponse>> {
         const result = await this.formService.updateFormDetails(request);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get('/all/statistics')
+    @HttpCode(200)
+    async findStatistics(
+        @Admin() user: User,
+    ): Promise<WebResponse<FormTotalStatistics>> {
+        const result = await this.formService.findFormStatistics(user);
 
         return {
             data: result,

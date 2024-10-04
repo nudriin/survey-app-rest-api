@@ -392,6 +392,42 @@ describe('FormController', () => {
             await testService.deleteForm();
         });
     });
+
+    describe('GET /api/v1/forms/all/statistics', () => {
+        let token: string;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        let tokenUser: string;
+        beforeEach(async () => {
+            let response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+
+            response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@test.com',
+                    password: 'test',
+                });
+            tokenUser = response.body.data.token;
+        });
+        it('should be success get forms statistics', async () => {
+            const response = await request(app.getHttpServer())
+                .get('/api/v1/forms/all/statistics')
+                .set('Authorization', `Bearer ${token}`);
+
+            console.info(response.body);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBeDefined();
+            expect(response.body.data.totalVisit).toBeDefined();
+            expect(response.body.data.totalSubmission).toBeDefined();
+            expect(response.body.data.totalSubmissionThisMonth).toBeDefined();
+        });
+    });
 });
 
 // {

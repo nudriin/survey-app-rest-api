@@ -6,18 +6,27 @@ import {
     FormDetailsResponse,
     FormResponse,
     FormSaveRequest,
+    FormTotalStatistics,
     FormUpdateRequest,
 } from '../model/form.model';
 import { User } from '@prisma/client';
 import { FormValidation } from './form.validation';
 import { v4 as uuid } from 'uuid';
+import { toZonedTime } from 'date-fns-tz';
+import { endOfMonth, startOfMonth } from 'date-fns';
 
 @Injectable()
 export class FormService {
+    private timeZone = 'Asia/Jakarta';
+
     constructor(
         private prismaService: PrismaService,
         private validationService: ValidationService,
     ) {}
+
+    private getZonedDate(): Date {
+        return toZonedTime(new Date(), this.timeZone);
+    }
 
     async saveForm(
         request: FormSaveRequest,
@@ -204,5 +213,58 @@ export class FormService {
         });
 
         return form;
+    }
+
+    async findAllTotalVisits(): Promise<number> {
+        const sumVisit = await this.prismaService.form.aggregate({
+            _sum: {
+                visit: true,
+            },
+        });
+
+        return sumVisit._sum.visit;
+    }
+
+    async findAllTotalSubmissions(): Promise<number> {
+        return await this.prismaService.formDetails.count();
+    }
+
+    async findAllTotalSubmissionThisMonth(): Promise<number> {
+        const now = this.getZonedDate();
+        const monthStart = startOfMonth(now);
+        const monthEnd = endOfMonth(now);
+        return await this.prismaService.formDetails.count({
+            where: {
+                createdAt: {
+                    gte: monthStart,
+                    lte: monthEnd,
+                },
+            },
+        });
+    }
+
+    async findFormStatistics(user: User): Promise<FormTotalStatistics> {
+        const countUser = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (countUser === 0) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const [totalVisit, totalSubmission, totalSubmissionThisMonth] =
+            await Promise.all([
+                this.findAllTotalVisits(),
+                this.findAllTotalSubmissions(),
+                this.findAllTotalSubmissionThisMonth(),
+            ]);
+
+        return {
+            totalVisit,
+            totalSubmission,
+            totalSubmissionThisMonth,
+        };
     }
 }

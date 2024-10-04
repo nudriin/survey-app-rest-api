@@ -42,3 +42,9 @@ export class FormDetailsResponse {
     userId: number;
     formDetails: FormDetails[];
 }
+
+export class FormTotalStatistics {
+    totalVisit: number;
+    totalSubmission: number;
+    totalSubmissionThisMonth: number;
+}
