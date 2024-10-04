@@ -17,6 +17,7 @@ import {
     FormSaveRequest,
     FormTotalStatistics,
     FormUpdateRequest,
+    SubmissionDistributionByForm,
 } from '../model/form.model';
 import { User } from '@prisma/client';
 import { Admin } from '../common/admin.decorator';
@@ -103,6 +104,19 @@ export class FormController {
         @Admin() user: User,
     ): Promise<WebResponse<FormTotalStatistics>> {
         const result = await this.formService.findFormStatistics(user);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get('/all/submission-distribution-form')
+    @HttpCode(200)
+    async findSubmissionDistribution(
+        @Admin() user: User,
+    ): Promise<WebResponse<SubmissionDistributionByForm[]>> {
+        const result =
+            await this.formService.findSubmissionDistributionByForm(user);
 
         return {
             data: result,

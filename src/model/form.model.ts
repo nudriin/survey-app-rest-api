@@ -48,3 +48,8 @@ export class FormTotalStatistics {
     totalSubmission: number;
     totalSubmissionThisMonth: number;
 }
+
+export class SubmissionDistributionByForm {
+    form: string;
+    count: number;
+}

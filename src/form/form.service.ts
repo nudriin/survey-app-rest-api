@@ -8,6 +8,7 @@ import {
     FormSaveRequest,
     FormTotalStatistics,
     FormUpdateRequest,
+    SubmissionDistributionByForm,
 } from '../model/form.model';
 import { User } from '@prisma/client';
 import { FormValidation } from './form.validation';
@@ -266,5 +267,37 @@ export class FormService {
             totalSubmission,
             totalSubmissionThisMonth,
         };
+    }
+
+    async findSubmissionDistributionByForm(
+        user: User,
+    ): Promise<SubmissionDistributionByForm[]> {
+        const countUser = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (countUser === 0) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const data = await this.prismaService.$queryRaw<
+            { form: string | undefined; count: number | null }[]
+        >`
+        SELECT fm.name as form, COUNT(sm.id) as count
+        FROM form_details as sm
+        JOIN forms as fm ON (fm.id = sm.formId)
+        GROUP by form
+        `;
+
+        const mappedData = data.map((value) => {
+            return {
+                form: value.form,
+                count: Number(value.count),
+            };
+        });
+
+        return mappedData;
     }
 }
