@@ -16,6 +16,12 @@ export class FormDetailsRequest {
     content?: string;
 }
 
+export class FormDetailsByDetailIdRequest {
+    detailId: number;
+    shareURL: string;
+    content?: string;
+}
+
 export class FormResponse {
     id: number;
     createdAt: Date;

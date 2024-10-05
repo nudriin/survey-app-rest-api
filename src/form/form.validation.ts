@@ -22,5 +22,11 @@ export class FormValidation {
         content: z.string().optional(),
     });
 
+    static readonly UPDATE_DETAILS_BY_ID = z.object({
+        detailId: z.number().min(0),
+        shareURL: z.string().min(1),
+        content: z.string().optional(),
+    });
+
     static readonly FIND_URL = z.string().min(1);
 }

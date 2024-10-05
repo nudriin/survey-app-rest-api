@@ -12,6 +12,7 @@ import {
 import { FormService } from './form.service';
 import { WebResponse } from '../model/web.model';
 import {
+    FormDetailsByDetailIdRequest,
     FormDetailsRequest,
     FormDetailsResponse,
     FormResponse,
@@ -156,6 +157,19 @@ export class FormController {
         @Param('detailId', ParseIntPipe) detailId: number,
     ): Promise<WebResponse<FormDetails>> {
         const result = await this.formService.findByIdFormDetails(detailId);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Patch('/url/detail')
+    @HttpCode(200)
+    async updateDetailsByDetailId(
+        @Body() request: FormDetailsByDetailIdRequest,
+    ): Promise<WebResponse<FormDetailsResponse>> {
+        const result =
+            await this.formService.updateFormDetailsByDetailId(request);
 
         return {
             data: result,
