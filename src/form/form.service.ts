@@ -11,7 +11,7 @@ import {
     MonthlySubmissionCount,
     SubmissionDistributionByForm,
 } from '../model/form.model';
-import { User } from '@prisma/client';
+import { FormDetails, User } from '@prisma/client';
 import { FormValidation } from './form.validation';
 import { v4 as uuid } from 'uuid';
 import { toZonedTime } from 'date-fns-tz';
@@ -376,5 +376,24 @@ export class FormService {
         });
 
         await this.prismaService.$transaction([deleteFormDetail, deleteForm]);
+    }
+
+    async findByIdFormDetails(detailId: number): Promise<FormDetails> {
+        const validFormId: number = this.validationService.validate(
+            FormValidation.FIND_ID,
+            detailId,
+        );
+
+        const form = await this.prismaService.formDetails.findUnique({
+            where: {
+                id: validFormId,
+            },
+        });
+
+        if (!form) {
+            throw new HttpException('form detail not found', 404);
+        }
+
+        return form;
     }
 }

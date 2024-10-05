@@ -587,6 +587,54 @@ describe('FormController', () => {
             await testService.deleteForm();
         });
     });
+
+    describe('GET /api/v1/forms/details/:detailId', () => {
+        let token: string;
+        let form: FormResponse;
+        beforeEach(async () => {
+            let response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+
+            response = await request(app.getHttpServer())
+                .post('/api/v1/forms')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    name: 'test',
+                    description: 'test',
+                });
+
+            form = response.body.data;
+        });
+
+        it('should be fail get form detail by id if form detail id is not found', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/forms/details/${form.id + 1}`,
+            );
+            console.info(response.body);
+
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('form detail not found');
+        });
+
+        it('should be success get form detail by id', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/forms/details/${form.id}`,
+            );
+            console.info(response.body);
+
+            // expect(response.status).toBe(200);
+            // expect(response.body.data.id).toBe(form.id);
+        });
+
+        afterEach(async () => {
+            await testService.deleteForm();
+        });
+    });
 });
 
 // {

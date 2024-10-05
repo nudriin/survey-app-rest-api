@@ -21,7 +21,7 @@ import {
     MonthlySubmissionCount,
     SubmissionDistributionByForm,
 } from '../model/form.model';
-import { User } from '@prisma/client';
+import { FormDetails, User } from '@prisma/client';
 import { Admin } from '../common/admin.decorator';
 
 @Controller('/api/v1/forms')
@@ -147,6 +147,18 @@ export class FormController {
 
         return {
             data: 'OK',
+        };
+    }
+
+    @Get('/details/:detailId')
+    @HttpCode(200)
+    async findDetailById(
+        @Param('detailId', ParseIntPipe) detailId: number,
+    ): Promise<WebResponse<FormDetails>> {
+        const result = await this.formService.findByIdFormDetails(detailId);
+
+        return {
+            data: result,
         };
     }
 }
