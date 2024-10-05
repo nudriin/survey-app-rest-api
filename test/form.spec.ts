@@ -527,6 +527,66 @@ describe('FormController', () => {
             expect(response.body.errors).toBeDefined();
         });
     });
+
+    describe('DELETE /api/v1/forms/:formId', () => {
+        let token: string;
+        let form: FormResponse;
+        beforeEach(async () => {
+            await testService.deleteSuperAdmin();
+            await testService.createSuperAdmin();
+            let response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+
+            response = await request(app.getHttpServer())
+                .post('/api/v1/forms')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    name: 'test',
+                    description: 'test',
+                });
+
+            form = response.body.data;
+        });
+
+        it('should be fail delete form by id if form id is not found', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/forms/${form.id + 1}`)
+                .set('Authorization', `Bearer ${token}`);
+            console.info(response.body);
+
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('form not found');
+        });
+
+        it('should be fail delete form by id if user no login', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/forms/${form.id + 1}`)
+                .set('Authorization', `Bearer ${token + 1}`);
+            console.info(response.body);
+
+            expect(response.status).toBe(401);
+            expect(response.body.errors).toBe('Unauthorized');
+        });
+
+        it('should be success delete form by id', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/forms/${form.id}`)
+                .set('Authorization', `Bearer ${token}`);
+            console.info(response.body);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBe('OK');
+        });
+
+        afterEach(async () => {
+            await testService.deleteForm();
+        });
+    });
 });
 
 // {

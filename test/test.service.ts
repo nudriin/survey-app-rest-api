@@ -51,18 +51,31 @@ export class TestService {
         });
 
         if (user) {
-            await this.prismaService.form.deleteMany({
+            const form = await this.prismaService.form.findFirst({
                 where: {
                     userId: user.id,
                 },
             });
-        }
 
-        await this.prismaService.user.deleteMany({
-            where: {
-                email: 'test@superadmin.com',
-            },
-        });
+            if (form) {
+                await this.prismaService.formDetails.deleteMany({
+                    where: {
+                        formId: form.id,
+                    },
+                });
+
+                await this.prismaService.form.deleteMany({
+                    where: {
+                        id: form.id,
+                    },
+                });
+            }
+            await this.prismaService.user.deleteMany({
+                where: {
+                    email: 'test@superadmin.com',
+                },
+            });
+        }
     }
 
     async createUser(): Promise<User> {

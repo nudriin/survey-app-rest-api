@@ -224,7 +224,7 @@ export class FormService {
             },
         });
 
-        return sumVisit._sum.visit;
+        return sumVisit._sum.visit ? sumVisit._sum.visit : 0;
     }
 
     async findAllTotalSubmissions(): Promise<number> {
@@ -335,5 +335,46 @@ export class FormService {
         });
 
         return mappedData;
+    }
+
+    async removeFormById(formId: number, user: User) {
+        const validFormId: number = this.validationService.validate(
+            FormValidation.FIND_ID,
+            formId,
+        );
+
+        const countUser = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (countUser === 0) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const countForm = await this.prismaService.form.count({
+            where: {
+                id: validFormId,
+            },
+        });
+
+        if (countForm === 0) {
+            throw new HttpException('form not found', 404);
+        }
+
+        const deleteFormDetail = this.prismaService.formDetails.deleteMany({
+            where: {
+                formId: validFormId,
+            },
+        });
+
+        const deleteForm = this.prismaService.form.delete({
+            where: {
+                id: validFormId,
+            },
+        });
+
+        await this.prismaService.$transaction([deleteFormDetail, deleteForm]);
     }
 }

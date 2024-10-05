@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     HttpCode,
     Param,
@@ -133,6 +134,19 @@ export class FormController {
 
         return {
             data: result,
+        };
+    }
+
+    @Delete('/:formId')
+    @HttpCode(200)
+    async deleteById(
+        @Param('formId', ParseIntPipe) formId: number,
+        @Admin() user: User,
+    ): Promise<WebResponse<string>> {
+        await this.formService.removeFormById(formId, user);
+
+        return {
+            data: 'OK',
         };
     }
 }
