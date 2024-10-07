@@ -6,6 +6,7 @@ import { ValidationService } from './validation.service';
 import { APP_FILTER } from '@nestjs/core';
 import { ErrorFilter } from './error.filter';
 import { AuthMiddleware } from './auth.middleware';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { AuthMiddleware } from './auth.middleware';
         ConfigModule.forRoot({
             isGlobal: true,
         }),
+        ScheduleModule.forRoot(),
     ],
     providers: [
         PrismaService,
