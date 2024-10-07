@@ -8,6 +8,7 @@ import { ErrorFilter } from './error.filter';
 import { AuthMiddleware } from './auth.middleware';
 import { ScheduleModule } from '@nestjs/schedule';
 import { EmailService } from './email.service';
+import { DatabaseBackupService } from './db-backup.service';
 
 @Global()
 @Module({
@@ -28,8 +29,14 @@ import { EmailService } from './email.service';
             useClass: ErrorFilter,
         },
         EmailService,
+        DatabaseBackupService,
     ],
-    exports: [PrismaService, ValidationService, EmailService],
+    exports: [
+        PrismaService,
+        ValidationService,
+        EmailService,
+        DatabaseBackupService,
+    ],
 })
 export class CommonModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
