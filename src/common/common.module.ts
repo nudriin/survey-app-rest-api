@@ -7,6 +7,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { ErrorFilter } from './error.filter';
 import { AuthMiddleware } from './auth.middleware';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EmailService } from './email.service';
 
 @Global()
 @Module({
@@ -26,8 +27,9 @@ import { ScheduleModule } from '@nestjs/schedule';
             provide: APP_FILTER,
             useClass: ErrorFilter,
         },
+        EmailService,
     ],
-    exports: [PrismaService, ValidationService],
+    exports: [PrismaService, ValidationService, EmailService],
 })
 export class CommonModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
