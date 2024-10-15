@@ -72,7 +72,7 @@ model Question {
   option_2  String
   option_3  String
   option_4  String
-  status    Boolean
+  status    Boolean    @default(false)
   responses Response[]
 
   @@map("questions")
