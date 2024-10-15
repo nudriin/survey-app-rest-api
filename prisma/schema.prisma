@@ -63,3 +63,46 @@ model FormDetails {
 
   @@map("form_details")
 }
+
+model Question {
+  id        Int        @id @default(autoincrement())
+  question  String
+  acronim   String
+  option_1  String
+  option_2  String
+  option_3  String
+  option_4  String
+  status    Boolean
+  responses Response[]
+
+  @@map("questions")
+}
+
+model Responden {
+  id           Int        @id @default(autoincrement())
+  name         String
+  email        String
+  address      String
+  phone        String
+  age          Int
+  education    String
+  profession   String
+  service_type String
+  responses    Response[]
+
+  @@map("respondens")
+}
+
+model Response {
+  id            Int       @id @default(autoincrement())
+  question_id   Int
+  responden_id  Int
+  select_option Int
+  created_at    DateTime  @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
+  question      Question  @relation(fields: [question_id], references: [id])
+  responden     Responden @relation(fields: [responden_id], references: [id])
+
+  @@index([question_id])
+  @@index([responden_id])
+  @@map("responses")
+}
