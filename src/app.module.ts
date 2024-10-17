@@ -3,9 +3,10 @@ import { CommonModule } from './common/common.module';
 import { UserModule } from './user/user.module';
 import { FormModule } from './form/form.module';
 import { QuestionModule } from './question/question.module';
+import { RespondenModule } from './responden/responden.module';
 
 @Module({
-    imports: [CommonModule, UserModule, FormModule, QuestionModule],
+    imports: [CommonModule, UserModule, FormModule, QuestionModule, RespondenModule],
     controllers: [],
     providers: [],
 })
