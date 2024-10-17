@@ -4,6 +4,7 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { TestService } from './test.service';
 import { TestModule } from './test.module';
+import { RespondenResponse } from '../src/model/responden.model';
 describe('RespondenController', () => {
     let app: INestApplication;
     let testService: TestService;
@@ -127,6 +128,69 @@ describe('RespondenController', () => {
                 });
 
             console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.errors).toBeUndefined();
+            expect(response.body.data.id).toBeDefined();
+            expect(response.body.data.name).toBe('test');
+            expect(response.body.data.email).toBe('test@test.com');
+            expect(response.body.data.address).toBe('test');
+            expect(response.body.data.phone).toBe('test');
+            expect(response.body.data.age).toBe(1);
+            expect(response.body.data.education).toBe('test');
+            expect(response.body.data.profession).toBe('test');
+            expect(response.body.data.service_type).toBe('test');
+            expect(response.body.data.gender).toBe('MALE');
+        });
+    });
+
+    describe('GET /api/v1/skm/responden/:id', () => {
+        let token: string;
+        let responden: RespondenResponse;
+        beforeEach(async () => {
+            const response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+            await testService.deleteResponden();
+            responden = await testService.createResponden();
+        });
+
+        it('should be rejected if user not login', async () => {
+            const response = await request(app.getHttpServer())
+                .get(`/api/v1/skm/responden/${responden.id}`)
+                .set({
+                    authorization: `Bearer ${token + 1}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(401);
+            expect(response.body.errors).toBe('Unauthorized');
+        });
+
+        it('should be rejected if responden id not found', async () => {
+            const response = await request(app.getHttpServer())
+                .get(`/api/v1/skm/responden/${responden.id + 1}`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('responden not found');
+        });
+
+        it('should success get responden by id', async () => {
+            const response = await request(app.getHttpServer())
+                .get(`/api/v1/skm/responden/${responden.id}`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
             expect(response.status).toBe(200);
             expect(response.body.errors).toBeUndefined();
             expect(response.body.data.id).toBeDefined();

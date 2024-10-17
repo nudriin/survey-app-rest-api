@@ -10,7 +10,7 @@ export class QuestionValidation {
         option_4: z.string().min(1).max(225),
     });
 
-    static readonly FIND_ID = z.number().min(0);
+    static readonly FIND_ID = z.number().min(1);
 
     static readonly UPDATE = z.object({
         id: z.number().min(1),

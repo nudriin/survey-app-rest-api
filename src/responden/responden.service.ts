@@ -51,4 +51,32 @@ export class RespondenService {
 
         return responden;
     }
+
+    async findRespondenById(
+        respondenId: number,
+        user: User,
+    ): Promise<RespondenResponse> {
+        const validId = this.validationService.validate(
+            RespondenValidation.FIND_ID,
+            respondenId,
+        );
+
+        const userCount = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (userCount == 0) throw new HttpException('Unauthorized', 401);
+
+        const responden = await this.prismaService.responden.findUnique({
+            where: {
+                id: validId,
+            },
+        });
+
+        if (!responden) throw new HttpException('responden not found', 404);
+
+        return responden;
+    }
 }

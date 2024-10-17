@@ -12,4 +12,6 @@ export class RespondenValidation {
         service_type: z.string().min(1).max(255),
         gender: z.string().min(1).max(255),
     });
+
+    static readonly FIND_ID = z.number().min(1);
 }

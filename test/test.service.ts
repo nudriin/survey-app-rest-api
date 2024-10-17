@@ -190,7 +190,7 @@ export class TestService {
         const responden = await this.prismaService.responden.create({
             data: {
                 name: 'test',
-                email: 'test',
+                email: 'test@test.com',
                 address: 'test',
                 phone: 'test',
                 age: 1,
