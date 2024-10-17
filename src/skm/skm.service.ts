@@ -7,6 +7,7 @@ import {
 } from '../../dist/model/skm.model';
 import { User } from '@prisma/client';
 import { QuestionValidation } from './skm.validation';
+import { QuestionUpdateRequest } from '../model/skm.model';
 
 @Injectable()
 export class SkmService {
@@ -76,5 +77,53 @@ export class SkmService {
         }
 
         return questions;
+    }
+
+    async updateQuestion(
+        request: QuestionUpdateRequest,
+        user: User,
+    ): Promise<QuestionResponse> {
+        const validRequest: QuestionUpdateRequest =
+            this.validationService.validate(
+                QuestionValidation.UPDATE,
+                request,
+            ) as QuestionUpdateRequest;
+
+        const userCount = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (userCount == 0) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const question = await this.prismaService.question.findUnique({
+            where: {
+                id: validRequest.id,
+            },
+        });
+
+        if (!question) {
+            throw new HttpException('question not found', 404);
+        }
+
+        if (validRequest.question) question.question = validRequest.question;
+        if (validRequest.acronim) question.acronim = validRequest.acronim;
+        if (validRequest.option_1) question.option_1 = validRequest.option_1;
+        if (validRequest.option_2) question.option_2 = validRequest.option_2;
+        if (validRequest.option_3) question.option_3 = validRequest.option_3;
+        if (validRequest.option_4) question.option_4 = validRequest.option_4;
+        if (validRequest.status) question.status = validRequest.status;
+
+        const updatedQuestion = await this.prismaService.question.update({
+            where: {
+                id: question.id,
+            },
+            data: question,
+        });
+
+        return updatedQuestion;
     }
 }

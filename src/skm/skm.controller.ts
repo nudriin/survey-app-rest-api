@@ -5,16 +5,18 @@ import {
     HttpCode,
     Param,
     ParseIntPipe,
+    Patch,
     Post,
 } from '@nestjs/common';
 import { SkmService } from './skm.service';
 import { Admin } from '../common/admin.decorator';
 import { User } from '@prisma/client';
-import {
-    QuestionResponse,
-    QuestionSaveRequest,
-} from '../../dist/model/skm.model';
 import { WebResponse } from '../model/web.model';
+import {
+    QuestionSaveRequest,
+    QuestionUpdateRequest,
+    QuestionResponse,
+} from '../model/skm.model';
 
 @Controller('/api/v1/skm')
 export class SkmController {
@@ -49,6 +51,19 @@ export class SkmController {
     @HttpCode(200)
     async getAllQuestion(): Promise<WebResponse<QuestionResponse[]>> {
         const result = await this.skmService.findAllQuestion();
+
+        return {
+            data: result,
+        };
+    }
+
+    @Patch('/question')
+    @HttpCode(200)
+    async updateQuestion(
+        @Admin() admin: User,
+        @Body() request: QuestionUpdateRequest,
+    ): Promise<WebResponse<QuestionResponse>> {
+        const result = await this.skmService.updateQuestion(request, admin);
 
         return {
             data: result,
