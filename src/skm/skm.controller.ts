@@ -20,7 +20,7 @@ import { WebResponse } from '../model/web.model';
 export class SkmController {
     constructor(private skmService: SkmService) {}
 
-    @Post()
+    @Post('/question')
     @HttpCode(200)
     async createQuestion(
         @Admin() admin: User,

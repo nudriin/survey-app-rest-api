@@ -28,7 +28,7 @@ describe('SkmController', () => {
         done();
     });
 
-    describe('POST /api/v1/skm', () => {
+    describe('POST /api/v1/skm/question', () => {
         let token: string;
         beforeEach(async () => {
             const response = await request(app.getHttpServer())
@@ -42,7 +42,7 @@ describe('SkmController', () => {
         });
         it('should be rejected if user not login', async () => {
             const response = await request(app.getHttpServer())
-                .post('/api/v1/skm')
+                .post('/api/v1/skm/question')
                 .set({
                     authorization: `Bearer ${token + 1}`,
                 })
@@ -62,7 +62,7 @@ describe('SkmController', () => {
 
         it('should be rejected if request invalid', async () => {
             const response = await request(app.getHttpServer())
-                .post('/api/v1/skm')
+                .post('/api/v1/skm/question')
                 .set({
                     authorization: `Bearer ${token}`,
                 })
@@ -82,7 +82,7 @@ describe('SkmController', () => {
 
         it('should success create question', async () => {
             const response = await request(app.getHttpServer())
-                .post('/api/v1/skm')
+                .post('/api/v1/skm/question')
                 .set({
                     authorization: `Bearer ${token}`,
                 })
