@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     HttpCode,
     Param,
@@ -64,6 +65,22 @@ export class SkmController {
         @Body() request: QuestionUpdateRequest,
     ): Promise<WebResponse<QuestionResponse>> {
         const result = await this.skmService.updateQuestion(request, admin);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Delete('/question/:id')
+    @HttpCode(200)
+    async deleteQuestion(
+        @Param('id', ParseIntPipe) questionId: number,
+        @Admin() admin: User,
+    ): Promise<WebResponse<string>> {
+        const result = await this.skmService.deleteQuestionById(
+            questionId,
+            admin,
+        );
 
         return {
             data: result,

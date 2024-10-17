@@ -126,4 +126,39 @@ export class SkmService {
 
         return updatedQuestion;
     }
+
+    async deleteQuestionById(questionId: number, user: User): Promise<string> {
+        const validId = this.validationService.validate(
+            QuestionValidation.FIND_ID,
+            questionId,
+        );
+
+        const userCount = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (userCount == 0) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const question = await this.prismaService.question.findUnique({
+            where: {
+                id: validId,
+            },
+        });
+
+        if (!question) {
+            throw new HttpException('question not found', 404);
+        }
+
+        await this.prismaService.question.delete({
+            where: {
+                id: question.id,
+            },
+        });
+
+        return 'OK';
+    }
 }

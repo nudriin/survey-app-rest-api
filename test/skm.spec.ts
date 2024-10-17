@@ -161,7 +161,7 @@ describe('SkmController', () => {
         });
     });
 
-    describe('PATCH /api/v1/skm/question', () => {
+    describe('PATCH /api/v1/skm/question/:id', () => {
         let token: string;
         let question: QuestionResponse;
 
@@ -401,6 +401,59 @@ describe('SkmController', () => {
             expect(response.body.data.option_3).toBe('test');
             expect(response.body.data.option_4).toBe('test');
             expect(response.body.data.status).toBe(true);
+        });
+    });
+
+    describe('DELETE /api/v1/skm/question/:id', () => {
+        let token: string;
+        let question: QuestionResponse;
+        beforeEach(async () => {
+            const response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+            await testService.deleteQuestion();
+            question = await testService.createQuestion();
+        });
+
+        it('should be rejected if user not login', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/skm/question/${question.id}`)
+                .set({
+                    authorization: `Bearer ${token + 1}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(401);
+            expect(response.body.errors).toBe('Unauthorized');
+        });
+
+        it('should be rejected if question id not found', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/skm/question/${question.id + 10}`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('question not found');
+        });
+
+        it('should success delete question', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/skm/question/${question.id}`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.errors).toBeUndefined();
+            expect(response.body.data).toBe('OK');
         });
     });
 });
