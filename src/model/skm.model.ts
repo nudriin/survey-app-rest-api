@@ -7,7 +7,7 @@ export interface QuestionSaveRequest {
     option_4: string;
 }
 
-export interface QuestionSaveResponse {
+export interface QuestionResponse {
     id: number;
     question: string;
     acronim: string;

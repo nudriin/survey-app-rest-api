@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../src/common/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
+import { QuestionResponse } from '../dist/model/skm.model';
 
 @Injectable()
 export class TestService {
@@ -123,5 +124,42 @@ export class TestService {
                 },
             });
         }
+    }
+
+    async deleteQuestion() {
+        const question = await this.prismaService.question.findFirst({
+            where: {
+                question: 'test',
+            },
+        });
+
+        if (question) {
+            await this.prismaService.response.deleteMany({
+                where: {
+                    question_id: question.id,
+                },
+            });
+
+            await this.prismaService.question.deleteMany({
+                where: {
+                    question: 'test',
+                },
+            });
+        }
+    }
+
+    async createQuestion(): Promise<QuestionResponse> {
+        const question = await this.prismaService.question.create({
+            data: {
+                question: 'test',
+                acronim: 'test',
+                option_1: 'test',
+                option_2: 'test',
+                option_3: 'test',
+                option_4: 'test',
+            },
+        });
+
+        return question;
     }
 }
