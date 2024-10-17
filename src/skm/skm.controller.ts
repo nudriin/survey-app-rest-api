@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpCode,
+    Param,
+    ParseIntPipe,
+    Post,
+} from '@nestjs/common';
 import { SkmService } from './skm.service';
 import { Admin } from '../common/admin.decorator';
 import { User } from '@prisma/client';
@@ -19,6 +27,18 @@ export class SkmController {
         @Body() request: QuestionSaveRequest,
     ): Promise<WebResponse<QuestionResponse>> {
         const result = await this.skmService.saveQuestion(request, admin);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get('/question/:id')
+    @HttpCode(200)
+    async getQuestionById(
+        @Param('id', ParseIntPipe) questionId: number,
+    ): Promise<WebResponse<QuestionResponse>> {
+        const result = await this.skmService.findQuestionById(questionId);
 
         return {
             data: result,

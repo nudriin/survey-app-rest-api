@@ -9,4 +9,6 @@ export class QuestionValidation {
         option_3: z.string().min(1).max(225),
         option_4: z.string().min(1).max(225),
     });
+
+    static readonly FIND_ID = z.number().min(0);
 }

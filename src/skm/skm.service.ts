@@ -48,4 +48,23 @@ export class SkmService {
 
         return question;
     }
+
+    async findQuestionById(questionId: number): Promise<QuestionResponse> {
+        const validId = this.validationService.validate(
+            QuestionValidation.FIND_ID,
+            questionId,
+        );
+
+        const question = await this.prismaService.question.findUnique({
+            where: {
+                id: validId,
+            },
+        });
+
+        if (!question) {
+            throw new HttpException('question not found', 404);
+        }
+
+        return question;
+    }
 }
