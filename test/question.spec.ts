@@ -4,8 +4,8 @@ import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { TestService } from './test.service';
 import { TestModule } from './test.module';
-import { QuestionResponse } from '../src/model/skm.model';
-describe('SkmController', () => {
+import { QuestionResponse } from '../src/model/question.model';
+describe('QuestionController', () => {
     let app: INestApplication;
     let testService: TestService;
 

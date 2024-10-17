@@ -9,7 +9,7 @@ import {
     Patch,
     Post,
 } from '@nestjs/common';
-import { SkmService } from './skm.service';
+import { QuestionService } from './question.service';
 import { Admin } from '../common/admin.decorator';
 import { User } from '@prisma/client';
 import { WebResponse } from '../model/web.model';
@@ -17,67 +17,70 @@ import {
     QuestionSaveRequest,
     QuestionUpdateRequest,
     QuestionResponse,
-} from '../model/skm.model';
+} from '../model/question.model';
 
-@Controller('/api/v1/skm')
-export class SkmController {
-    constructor(private skmService: SkmService) {}
+@Controller('/api/v1/skm/question')
+export class QuestionController {
+    constructor(private questionService: QuestionService) {}
 
-    @Post('/question')
+    @Post()
     @HttpCode(200)
     async createQuestion(
         @Admin() admin: User,
         @Body() request: QuestionSaveRequest,
     ): Promise<WebResponse<QuestionResponse>> {
-        const result = await this.skmService.saveQuestion(request, admin);
+        const result = await this.questionService.saveQuestion(request, admin);
 
         return {
             data: result,
         };
     }
 
-    @Get('/question/:id')
+    @Get('/:id')
     @HttpCode(200)
     async getQuestionById(
         @Param('id', ParseIntPipe) questionId: number,
     ): Promise<WebResponse<QuestionResponse>> {
-        const result = await this.skmService.findQuestionById(questionId);
+        const result = await this.questionService.findQuestionById(questionId);
 
         return {
             data: result,
         };
     }
 
-    @Get('/question')
+    @Get()
     @HttpCode(200)
     async getAllQuestion(): Promise<WebResponse<QuestionResponse[]>> {
-        const result = await this.skmService.findAllQuestion();
+        const result = await this.questionService.findAllQuestion();
 
         return {
             data: result,
         };
     }
 
-    @Patch('/question')
+    @Patch()
     @HttpCode(200)
     async updateQuestion(
         @Admin() admin: User,
         @Body() request: QuestionUpdateRequest,
     ): Promise<WebResponse<QuestionResponse>> {
-        const result = await this.skmService.updateQuestion(request, admin);
+        const result = await this.questionService.updateQuestion(
+            request,
+            admin,
+        );
 
         return {
             data: result,
         };
     }
 
-    @Delete('/question/:id')
+    @Delete('/:id')
     @HttpCode(200)
     async deleteQuestion(
         @Param('id', ParseIntPipe) questionId: number,
         @Admin() admin: User,
     ): Promise<WebResponse<string>> {
-        const result = await this.skmService.deleteQuestionById(
+        const result = await this.questionService.deleteQuestionById(
             questionId,
             admin,
         );

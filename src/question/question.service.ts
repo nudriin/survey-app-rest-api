@@ -4,13 +4,13 @@ import { ValidationService } from '../common/validation.service';
 import {
     QuestionResponse,
     QuestionSaveRequest,
-} from '../../dist/model/skm.model';
+    QuestionUpdateRequest,
+} from '../model/question.model';
 import { User } from '@prisma/client';
-import { QuestionValidation } from './skm.validation';
-import { QuestionUpdateRequest } from '../model/skm.model';
+import { QuestionValidation } from './question.validation';
 
 @Injectable()
-export class SkmService {
+export class QuestionService {
     constructor(
         private prismaService: PrismaService,
         private validationService: ValidationService,
