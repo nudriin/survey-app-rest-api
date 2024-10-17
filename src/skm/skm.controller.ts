@@ -44,4 +44,14 @@ export class SkmController {
             data: result,
         };
     }
+
+    @Get('/question')
+    @HttpCode(200)
+    async getAllQuestion(): Promise<WebResponse<QuestionResponse[]>> {
+        const result = await this.skmService.findAllQuestion();
+
+        return {
+            data: result,
+        };
+    }
 }

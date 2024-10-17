@@ -67,4 +67,14 @@ export class SkmService {
 
         return question;
     }
+
+    async findAllQuestion(): Promise<QuestionResponse[]> {
+        const questions = this.prismaService.question.findMany();
+
+        if (!questions) {
+            throw new HttpException('question not found', 404);
+        }
+
+        return questions;
+    }
 }

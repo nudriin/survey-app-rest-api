@@ -125,7 +125,7 @@ describe('SkmController', () => {
             expect(response.body.errors).toBe('question not found');
         });
 
-        it('should success create question', async () => {
+        it('should success get question by id', async () => {
             const response = await request(app.getHttpServer()).get(
                 `/api/v1/skm/question/${question.id}`,
             );
@@ -141,6 +141,23 @@ describe('SkmController', () => {
             expect(response.body.data.option_3).toBe(question.option_3);
             expect(response.body.data.option_4).toBe(question.option_4);
             expect(response.body.data.status).toBe(false);
+        });
+    });
+
+    describe('GET /api/v1/skm/question', () => {
+        beforeEach(async () => {
+            await testService.deleteQuestion();
+            await testService.createQuestion();
+        });
+
+        it('should success get all question', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/skm/question`,
+            );
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBeDefined();
         });
     });
 });
