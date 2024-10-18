@@ -1,6 +1,7 @@
 import {
     Body,
     Controller,
+    Delete,
     Get,
     HttpCode,
     Param,
@@ -74,6 +75,22 @@ export class RespondenController {
     ): Promise<WebResponse<RespondenResponse>> {
         const result = await this.respondenService.updateRespondenData(
             request,
+            admin,
+        );
+
+        return {
+            data: result,
+        };
+    }
+
+    @Delete('/:id')
+    @HttpCode(200)
+    async deleteResponden(
+        @Param('id', ParseIntPipe) respondenId: number,
+        @Admin() admin: User,
+    ): Promise<WebResponse<string>> {
+        const result = await this.respondenService.deleteRespondenById(
+            respondenId,
             admin,
         );
 

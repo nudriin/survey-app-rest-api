@@ -365,4 +365,56 @@ describe('RespondenController', () => {
             expect(response.body.data.gender).toBe('FEMALE');
         });
     });
+
+    describe('DELETE /api/v1/skm/responden/:id', () => {
+        let token: string;
+        let responden: RespondenResponse;
+        beforeEach(async () => {
+            const response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+            await testService.deleteResponden();
+            responden = await testService.createResponden();
+        });
+
+        it('should be rejected if user not login', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/skm/responden/${responden.id}`)
+                .set({
+                    authorization: `Bearer ${token + 1}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(401);
+            expect(response.body.errors).toBe('Unauthorized');
+        });
+
+        it('should be rejected if responden id not found', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/skm/responden/${responden.id + 1}`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('responden not found');
+        });
+
+        it('should success delete responden by id', async () => {
+            const response = await request(app.getHttpServer())
+                .delete(`/api/v1/skm/responden/${responden.id}`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBe('OK');
+        });
+    });
 });
