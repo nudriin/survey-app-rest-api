@@ -5,6 +5,7 @@ import {
     HttpCode,
     Param,
     ParseIntPipe,
+    Patch,
     Post,
 } from '@nestjs/common';
 import { RespondenService } from './responden.service';
@@ -13,6 +14,7 @@ import { User } from '@prisma/client';
 import {
     RespondenSaveRequest,
     RespondenResponse,
+    RespondenUpdateRequest,
 } from '../model/responden.model';
 import { WebResponse } from '../model/web.model';
 
@@ -58,6 +60,22 @@ export class RespondenController {
         @Admin() admin: User,
     ): Promise<WebResponse<RespondenResponse[]>> {
         const result = await this.respondenService.findAllResponden(admin);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Patch()
+    @HttpCode(200)
+    async updateResponden(
+        @Body() request: RespondenUpdateRequest,
+        @Admin() admin: User,
+    ): Promise<WebResponse<RespondenResponse>> {
+        const result = await this.respondenService.updateRespondenData(
+            request,
+            admin,
+        );
 
         return {
             data: result,

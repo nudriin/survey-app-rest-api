@@ -244,4 +244,125 @@ describe('RespondenController', () => {
             expect(response.body.data).toBeDefined();
         });
     });
+
+    describe('PATCH /api/v1/skm/responden', () => {
+        let token: string;
+        let responden: RespondenResponse;
+        beforeEach(async () => {
+            const response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+            await testService.deleteResponden();
+            responden = await testService.createResponden();
+        });
+
+        it('should be rejected if user not login', async () => {
+            const response = await request(app.getHttpServer())
+                .patch(`/api/v1/skm/responden`)
+                .set({
+                    authorization: `Bearer ${token + 1}`,
+                })
+                .send({
+                    id: responden.id,
+                    name: 'test',
+                    email: 'test@test.com',
+                    address: 'test',
+                    phone: 'test',
+                    age: 1,
+                    education: 'test',
+                    profession: 'test',
+                    service_type: 'test',
+                    gender: 'MALE',
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(401);
+            expect(response.body.errors).toBe('Unauthorized');
+        });
+
+        it('should be rejected if responden not found', async () => {
+            const response = await request(app.getHttpServer())
+                .patch(`/api/v1/skm/responden`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                })
+                .send({
+                    id: responden.id + 2,
+                    name: 'test',
+                    email: 'test@test.com',
+                    address: 'test',
+                    phone: 'test',
+                    age: 1,
+                    education: 'test',
+                    profession: 'test',
+                    service_type: 'test',
+                    gender: 'MALE',
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('responden not found');
+        });
+
+        it('should reject update responden if request invalid', async () => {
+            const response = await request(app.getHttpServer())
+                .patch(`/api/v1/skm/responden`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                })
+                .send({
+                    id: responden.id,
+                    name: '',
+                    email: '',
+                    address: '',
+                    phone: '',
+                    age: 0,
+                    education: '',
+                    profession: '',
+                    service_type: '',
+                    gender: '',
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toBeDefined();
+        });
+
+        it('should success update responden', async () => {
+            const response = await request(app.getHttpServer())
+                .patch(`/api/v1/skm/responden`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                })
+                .send({
+                    id: responden.id,
+                    name: 'test',
+                    email: 'new_mail@mail.com',
+                    address: 'new_address',
+                    phone: '0022211',
+                    age: 2,
+                    education: 'new_education',
+                    profession: 'new_profession',
+                    service_type: 'new_service',
+                    gender: 'FEMALE',
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.errors).toBeUndefined();
+            expect(response.body.data.name).toBe('test');
+            expect(response.body.data.email).toBe('new_mail@mail.com');
+            expect(response.body.data.address).toBe('new_address');
+            expect(response.body.data.phone).toBe('0022211');
+            expect(response.body.data.age).toBe(2);
+            expect(response.body.data.education).toBe('new_education');
+            expect(response.body.data.profession).toBe('new_profession');
+            expect(response.body.data.service_type).toBe('new_service');
+            expect(response.body.data.gender).toBe('FEMALE');
+        });
+    });
 });
