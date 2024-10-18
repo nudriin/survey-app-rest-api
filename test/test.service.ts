@@ -154,10 +154,10 @@ export class TestService {
             data: {
                 question: 'test',
                 acronim: 'test',
-                option_1: 'test',
-                option_2: 'test',
-                option_3: 'test',
-                option_4: 'test',
+                option_1: 'test_option_1',
+                option_2: 'test_option_2',
+                option_3: 'test_option_3',
+                option_4: 'test_option_4',
             },
         });
 

@@ -1,10 +1,9 @@
 import { z } from 'zod';
-import { PrismaService } from '../common/prisma.service';
-import { ValidationService } from '../common/validation.service';
 
 export class ResponsesValidation {
-    constructor(
-        private prismaService: PrismaService,
-        private validationService: ValidationService,
-    ) {}
+    static readonly SAVE = z.object({
+        question_id: z.number().min(1),
+        responden_id: z.number().min(1),
+        select_option: z.number().min(1),
+    });
 }
