@@ -205,4 +205,43 @@ describe('RespondenController', () => {
             expect(response.body.data.gender).toBe('MALE');
         });
     });
+
+    describe('GET /api/v1/skm/responden', () => {
+        let token: string;
+        beforeEach(async () => {
+            const response = await request(app.getHttpServer())
+                .post('/api/v1/users/login')
+                .send({
+                    email: 'test@superadmin.com',
+                    password: 'test',
+                });
+            token = response.body.data.token;
+            await testService.deleteResponden();
+            await testService.createResponden();
+        });
+
+        it('should be rejected if user not login', async () => {
+            const response = await request(app.getHttpServer())
+                .get(`/api/v1/skm/responden`)
+                .set({
+                    authorization: `Bearer ${token + 1}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(401);
+            expect(response.body.errors).toBe('Unauthorized');
+        });
+
+        it('should success get all responden', async () => {
+            const response = await request(app.getHttpServer())
+                .get(`/api/v1/skm/responden`)
+                .set({
+                    authorization: `Bearer ${token}`,
+                });
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBeDefined();
+        });
+    });
 });

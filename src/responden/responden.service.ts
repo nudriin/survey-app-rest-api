@@ -79,4 +79,20 @@ export class RespondenService {
 
         return responden;
     }
+
+    async findAllResponden(user: User): Promise<RespondenResponse[]> {
+        const userCount = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (userCount == 0) throw new HttpException('Unauthorized', 401);
+
+        const respondens = await this.prismaService.responden.findMany();
+
+        if (!respondens) throw new HttpException('responden not found', 404);
+
+        return respondens;
+    }
 }

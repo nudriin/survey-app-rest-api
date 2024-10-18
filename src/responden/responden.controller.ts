@@ -51,4 +51,16 @@ export class RespondenController {
             data: result,
         };
     }
+
+    @Get()
+    @HttpCode(200)
+    async getAllResponden(
+        @Admin() admin: User,
+    ): Promise<WebResponse<RespondenResponse[]>> {
+        const result = await this.respondenService.findAllResponden(admin);
+
+        return {
+            data: result,
+        };
+    }
 }
