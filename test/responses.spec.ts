@@ -119,4 +119,23 @@ describe('ResponsesController', () => {
             expect(response.body.data.select_option).toBe(1);
         });
     });
+
+    describe('GET /api/v1/skm/responses/:questionId/all', () => {
+        let responses: ResponsesResponse;
+        beforeEach(async () => {
+            await testService.deleteQuestion();
+            await testService.deleteResponden();
+            responses = await testService.createResponses();
+        });
+
+        it('should success get responses by question id', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/skm/responses/${responses.question_id}/all`,
+            );
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.data).toBeDefined();
+        });
+    });
 });

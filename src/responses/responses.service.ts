@@ -75,4 +75,37 @@ export class ResponsesService {
             selectedOptionText,
         };
     }
+
+    async findAllResponsesByQuestionId(
+        questionId: number,
+    ): Promise<ResponsesResponse[]> {
+        const validId = this.validationService.validate(
+            ResponsesValidation.FIND_ID,
+            questionId,
+        );
+
+        const allResponses = await this.prismaService.response.findMany({
+            where: {
+                question_id: validId,
+            },
+            include: {
+                question: true,
+                responden: true,
+            },
+            orderBy: {
+                created_at: 'desc',
+            },
+        });
+
+        if (!allResponses) throw new HttpException('responses not found', 404);
+
+        return allResponses.map((value) => {
+            const selectedOptionKey = `option_${value.select_option}`;
+            const selectedOptionText = value.question[selectedOptionKey];
+            return {
+                ...value,
+                selectedOptionText,
+            };
+        });
+    }
 }

@@ -42,4 +42,19 @@ export class ResponsesController {
             data: result,
         };
     }
+
+    @Get('/:questionId/all')
+    @HttpCode(200)
+    async getAllResponsesByQuestionId(
+        @Param('questionId', ParseIntPipe) responsesId: number,
+    ): Promise<WebResponse<ResponsesResponse[]>> {
+        const result =
+            await this.responsesService.findAllResponsesByQuestionId(
+                responsesId,
+            );
+
+        return {
+            data: result,
+        };
+    }
 }
