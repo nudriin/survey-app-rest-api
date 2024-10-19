@@ -23,14 +23,13 @@ export class ResponsesService {
                 request,
             ) as ResponsesSaveRequest;
 
-        const countQuestion = await this.prismaService.question.count({
+        const question = await this.prismaService.question.findUnique({
             where: {
                 id: validRequest.question_id,
             },
         });
 
-        if (countQuestion == 0)
-            throw new HttpException('question not found', 404);
+        if (!question) throw new HttpException('question not found', 404);
 
         const countResponden = await this.prismaService.responden.count({
             where: {
@@ -41,11 +40,15 @@ export class ResponsesService {
         if (countResponden == 0)
             throw new HttpException('responden not found', 404);
 
+        const selectedOptionKey = `option_${validRequest.select_option}`;
+        const selectedOptionText = question[selectedOptionKey];
+
         const responses = await this.prismaService.response.create({
             data: {
                 question_id: validRequest.question_id,
                 responden_id: validRequest.responden_id,
                 select_option: validRequest.select_option,
+                select_option_text: selectedOptionText,
             },
         });
 
@@ -68,12 +71,7 @@ export class ResponsesService {
 
         if (!response) throw new HttpException('responses not found', 404);
 
-        const selectedOptionKey = `option_${response.select_option}`;
-        const selectedOptionText = response.question[selectedOptionKey];
-        return {
-            ...response,
-            selectedOptionText,
-        };
+        return response;
     }
 
     async findAllResponsesByQuestionId(
@@ -99,13 +97,6 @@ export class ResponsesService {
 
         if (!allResponses) throw new HttpException('responses not found', 404);
 
-        return allResponses.map((value) => {
-            const selectedOptionKey = `option_${value.select_option}`;
-            const selectedOptionText = value.question[selectedOptionKey];
-            return {
-                ...value,
-                selectedOptionText,
-            };
-        });
+        return allResponses;
     }
 }

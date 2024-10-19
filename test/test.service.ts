@@ -214,6 +214,7 @@ export class TestService {
                 question_id: question.id,
                 responden_id: responden.id,
                 select_option: 1,
+                select_option_text: question.option_1,
             },
         });
 
