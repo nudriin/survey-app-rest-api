@@ -153,6 +153,12 @@ export class QuestionService {
             throw new HttpException('question not found', 404);
         }
 
+        await this.prismaService.response.deleteMany({
+            where: {
+                question_id: question.id,
+            },
+        });
+
         await this.prismaService.question.delete({
             where: {
                 id: question.id,
