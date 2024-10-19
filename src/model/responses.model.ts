@@ -4,7 +4,7 @@ export interface ResponsesResponse {
     responden_id: number;
     select_option: number;
     created_at: Date;
-    selectedOptionText?: string;
+    select_option_text: string;
 }
 
 export class ResponsesSaveRequest {

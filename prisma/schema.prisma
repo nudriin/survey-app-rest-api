@@ -66,12 +66,12 @@ model FormDetails {
 
 model Question {
   id        Int        @id @default(autoincrement())
-  question  String
-  acronim   String
-  option_1  String
-  option_2  String
-  option_3  String
-  option_4  String
+  question  String     @db.VarChar(225)
+  acronim   String     @db.VarChar(225)
+  option_1  String     @db.VarChar(225)
+  option_2  String     @db.VarChar(225)
+  option_3  String     @db.VarChar(225)
+  option_4  String     @db.VarChar(225)
   status    Boolean    @default(false)
   responses Response[]
 
@@ -80,14 +80,14 @@ model Question {
 
 model Responden {
   id           Int        @id @default(autoincrement())
-  name         String
-  email        String
-  address      String
-  phone        String
+  name         String     @db.VarChar(225)
+  email        String     @db.VarChar(225)
+  address      String     @db.VarChar(225)
+  phone        String     @db.VarChar(225)
   age          Int
-  education    String
-  profession   String
-  service_type String
+  education    String     @db.VarChar(225)
+  profession   String     @db.VarChar(225)
+  service_type String     @db.VarChar(225)
   gender       Gender
   responses    Response[]
 
@@ -95,13 +95,14 @@ model Responden {
 }
 
 model Response {
-  id            Int       @id @default(autoincrement())
-  question_id   Int
-  responden_id  Int
-  select_option Int
-  created_at    DateTime  @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
-  question      Question  @relation(fields: [question_id], references: [id])
-  responden     Responden @relation(fields: [responden_id], references: [id])
+  id                 Int       @id @default(autoincrement())
+  question_id        Int
+  responden_id       Int
+  select_option      Int
+  select_option_text String    @db.VarChar(225)
+  created_at         DateTime  @default(dbgenerated("CURRENT_TIMESTAMP")) @db.Timestamp()
+  question           Question  @relation(fields: [question_id], references: [id])
+  responden          Responden @relation(fields: [responden_id], references: [id])
 
   @@index([question_id])
   @@index([responden_id])
