@@ -29,46 +29,13 @@ describe('RespondenController', () => {
     });
 
     describe('POST /api/v1/skm/responden', () => {
-        let token: string;
         beforeEach(async () => {
-            const response = await request(app.getHttpServer())
-                .post('/api/v1/users/login')
-                .send({
-                    email: 'test@superadmin.com',
-                    password: 'test',
-                });
-            token = response.body.data.token;
             await testService.deleteResponden();
-        });
-        it('should be rejected if user not login', async () => {
-            const response = await request(app.getHttpServer())
-                .post('/api/v1/skm/responden')
-                .set({
-                    authorization: `Bearer ${token + 1}`,
-                })
-                .send({
-                    name: 'test',
-                    email: 'test',
-                    address: 'test',
-                    phone: 'test',
-                    age: 1,
-                    education: 'test',
-                    profession: 'test',
-                    service_type: 'test',
-                    gender: 'MALE',
-                });
-
-            console.log(response.body);
-            expect(response.status).toBe(401);
-            expect(response.body.errors).toBe('Unauthorized');
         });
 
         it('should be rejected if request invalid', async () => {
             const response = await request(app.getHttpServer())
                 .post('/api/v1/skm/responden')
-                .set({
-                    authorization: `Bearer ${token}`,
-                })
                 .send({
                     name: '',
                     email: '',
@@ -89,9 +56,6 @@ describe('RespondenController', () => {
         it('should be rejected if gender not match', async () => {
             const response = await request(app.getHttpServer())
                 .post('/api/v1/skm/responden')
-                .set({
-                    authorization: `Bearer ${token}`,
-                })
                 .send({
                     name: 'test',
                     email: 'test@test.com',
@@ -112,9 +76,6 @@ describe('RespondenController', () => {
         it('should success create responden', async () => {
             const response = await request(app.getHttpServer())
                 .post('/api/v1/skm/responden')
-                .set({
-                    authorization: `Bearer ${token}`,
-                })
                 .send({
                     name: 'test',
                     email: 'test@test.com',

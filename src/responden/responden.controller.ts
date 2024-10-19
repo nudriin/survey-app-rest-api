@@ -26,13 +26,9 @@ export class RespondenController {
     @Post()
     @HttpCode(200)
     async save(
-        @Admin() admin: User,
         @Body() request: RespondenSaveRequest,
     ): Promise<WebResponse<RespondenResponse>> {
-        const result = await this.respondenService.saveResponden(
-            request,
-            admin,
-        );
+        const result = await this.respondenService.saveResponden(request);
 
         return {
             data: result,

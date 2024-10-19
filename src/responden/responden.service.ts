@@ -18,23 +18,12 @@ export class RespondenService {
 
     async saveResponden(
         request: RespondenSaveRequest,
-        user: User,
     ): Promise<RespondenResponse> {
         const validRequest: RespondenSaveRequest =
             this.validationService.validate(
                 RespondenValidation.SAVE,
                 request,
             ) as RespondenSaveRequest;
-
-        const userCount = await this.prismaService.user.count({
-            where: {
-                id: user.id,
-            },
-        });
-
-        if (userCount == 0) {
-            throw new HttpException('Unauthorized', 401);
-        }
 
         const responden = await this.prismaService.responden.create({
             data: {
