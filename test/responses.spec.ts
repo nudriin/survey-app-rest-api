@@ -6,6 +6,7 @@ import { TestService } from './test.service';
 import { TestModule } from './test.module';
 import { RespondenResponse } from '../src/model/responden.model';
 import { QuestionResponse } from '../src/model/question.model';
+import { ResponsesResponse } from '../src/model/responses.model';
 describe('ResponsesController', () => {
     let app: INestApplication;
     let testService: TestService;
@@ -81,6 +82,40 @@ describe('ResponsesController', () => {
             expect(response.body.data.id).toBeDefined();
             expect(response.body.data.question_id).toBe(question.id);
             expect(response.body.data.responden_id).toBe(responden.id);
+            expect(response.body.data.select_option).toBe(1);
+        });
+    });
+
+    describe('GET /api/v1/skm/responses/:responsesId/response', () => {
+        let responses: ResponsesResponse;
+        beforeEach(async () => {
+            await testService.deleteQuestion();
+            await testService.deleteResponden();
+            responses = await testService.createResponses();
+        });
+
+        it('should be rejected if responses id not found', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/skm/responses/${responses.id + 10}/response`,
+            );
+
+            console.log(response.body);
+            expect(response.status).toBe(404);
+            expect(response.body.errors).toBe('responses not found');
+        });
+
+        it('should success get responses by id', async () => {
+            const response = await request(app.getHttpServer()).get(
+                `/api/v1/skm/responses/${responses.id}/response`,
+            );
+
+            console.log(response.body);
+            expect(response.status).toBe(200);
+            expect(response.body.data.id).toBeDefined();
+            expect(response.body.data.question_id).toBe(responses.question_id);
+            expect(response.body.data.responden_id).toBe(
+                responses.responden_id,
+            );
             expect(response.body.data.select_option).toBe(1);
         });
     });

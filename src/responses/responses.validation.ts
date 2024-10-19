@@ -6,4 +6,6 @@ export class ResponsesValidation {
         responden_id: z.number().min(1),
         select_option: z.number().min(1),
     });
+
+    static readonly FIND_ID = z.number().min(1);
 }

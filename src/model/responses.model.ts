@@ -1,18 +1,10 @@
-import { QuestionResponse } from './question.model';
-import { RespondenResponse } from './responden.model';
-
-export class ResponsesResponse {
+export interface ResponsesResponse {
     id: number;
     question_id: number;
     responden_id: number;
     select_option: number;
     created_at: Date;
-}
-
-export class ResponsesDetailedResponse {
-    question: QuestionResponse;
-    responden: RespondenResponse;
-    responses: ResponsesResponse;
+    selectedOptionText?: string;
 }
 
 export class ResponsesSaveRequest {

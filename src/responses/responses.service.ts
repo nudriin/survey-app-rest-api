@@ -51,4 +51,28 @@ export class ResponsesService {
 
         return responses;
     }
+
+    async findResponsesById(responsesId: number): Promise<ResponsesResponse> {
+        const validId = this.validationService.validate(
+            ResponsesValidation.FIND_ID,
+            responsesId,
+        );
+
+        const response = await this.prismaService.response.findUnique({
+            where: { id: validId },
+            include: {
+                question: true,
+                responden: true,
+            },
+        });
+
+        if (!response) throw new HttpException('responses not found', 404);
+
+        const selectedOptionKey = `option_${response.select_option}`;
+        const selectedOptionText = response.question[selectedOptionKey];
+        return {
+            ...response,
+            selectedOptionText,
+        };
+    }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    HttpCode,
+    Param,
+    ParseIntPipe,
+    Post,
+} from '@nestjs/common';
 import { ResponsesService } from './responses.service';
 import {
     ResponsesResponse,
@@ -16,6 +24,19 @@ export class ResponsesController {
         @Body() request: ResponsesSaveRequest,
     ): Promise<WebResponse<ResponsesResponse>> {
         const result = await this.responsesService.saveResponses(request);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get('/:responsesId/response')
+    @HttpCode(200)
+    async getResponsesById(
+        @Param('responsesId', ParseIntPipe) responsesId: number,
+    ): Promise<WebResponse<ResponsesResponse>> {
+        const result =
+            await this.responsesService.findResponsesById(responsesId);
 
         return {
             data: result,

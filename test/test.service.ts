@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
 import { QuestionResponse } from '../src/model/question.model';
 import { RespondenResponse } from '../src/model/responden.model';
+import { ResponsesResponse } from '../src/model/responses.model';
 
 @Injectable()
 export class TestService {
@@ -202,5 +203,20 @@ export class TestService {
         });
 
         return responden;
+    }
+
+    async createResponses(): Promise<ResponsesResponse> {
+        const question = await this.createQuestion();
+        const responden = await this.createResponden();
+
+        const responses = await this.prismaService.response.create({
+            data: {
+                question_id: question.id,
+                responden_id: responden.id,
+                select_option: 1,
+            },
+        });
+
+        return responses;
     }
 }
