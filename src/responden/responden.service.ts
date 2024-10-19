@@ -169,6 +169,12 @@ export class RespondenService {
             throw new HttpException('responden not found', 404);
         }
 
+        await this.prismaService.response.deleteMany({
+            where: {
+                responden_id: responden.id,
+            },
+        });
+
         await this.prismaService.responden.delete({
             where: {
                 id: responden.id,
