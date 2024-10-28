@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
 import {
+    ResponsesByUserResponse,
     ResponsesResponse,
     ResponsesSaveRequest,
 } from '../model/responses.model';
@@ -98,5 +99,27 @@ export class ResponsesService {
         if (!allResponses) throw new HttpException('responses not found', 404);
 
         return allResponses;
+    }
+
+    async findResponsesByUserId(
+        userId: number,
+    ): Promise<ResponsesByUserResponse[]> {
+        const validId = this.validationService.validate(
+            ResponsesValidation.FIND_ID,
+            userId,
+        );
+
+        const userResponses = await this.prismaService.response.findMany({
+            where: {
+                responden_id: validId,
+            },
+            include: {
+                question: true,
+            },
+        });
+
+        if (!userResponses) throw new HttpException('responses not found', 404);
+
+        return userResponses;
     }
 }

@@ -57,4 +57,17 @@ export class ResponsesController {
             data: result,
         };
     }
+
+    @Get('/:userId/user')
+    @HttpCode(200)
+    async getResponsesByUserId(
+        @Param('userId', ParseIntPipe) userId: number,
+    ): Promise<WebResponse<any>> {
+        const result =
+            await this.responsesService.findResponsesByUserId(userId);
+
+        return {
+            data: result,
+        };
+    }
 }
