@@ -5,8 +5,10 @@ import {
     ResponsesByUserResponse,
     ResponsesResponse,
     ResponsesSaveRequest,
+    ResponsesUpdateRequest,
 } from '../model/responses.model';
 import { ResponsesValidation } from './responses.validation';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class ResponsesService {
@@ -121,5 +123,43 @@ export class ResponsesService {
         if (!userResponses) throw new HttpException('responses not found', 404);
 
         return userResponses;
+    }
+
+    async updateUserResponse(
+        request: ResponsesUpdateRequest,
+        user: User,
+    ): Promise<ResponsesResponse> {
+        const validRequest: ResponsesUpdateRequest =
+            this.validationService.validate(
+                ResponsesValidation.UPDATE,
+                request,
+            ) as ResponsesUpdateRequest;
+
+        const userCount = await this.prismaService.user.count({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (userCount == 0) throw new HttpException('Unauthorized', 401);
+
+        const foundResponse = await this.prismaService.response.findUnique({
+            where: {
+                id: validRequest.id,
+            },
+        });
+
+        if (!foundResponse) throw new HttpException('responses not found', 404);
+
+        foundResponse.select_option = validRequest.select_option;
+
+        const responses = await this.prismaService.response.update({
+            where: {
+                id: foundResponse.id,
+            },
+            data: foundResponse,
+        });
+
+        return responses;
     }
 }

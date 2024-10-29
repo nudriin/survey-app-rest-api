@@ -1,3 +1,4 @@
+import { ResponsesUpdateRequest } from './../model/responses.model';
 import {
     Body,
     Controller,
@@ -5,6 +6,7 @@ import {
     HttpCode,
     Param,
     ParseIntPipe,
+    Patch,
     Post,
 } from '@nestjs/common';
 import { ResponsesService } from './responses.service';
@@ -13,6 +15,8 @@ import {
     ResponsesSaveRequest,
 } from '../model/responses.model';
 import { WebResponse } from '../model/web.model';
+import { Admin } from '../common/admin.decorator';
+import { User } from '@prisma/client';
 
 @Controller('/api/v1/skm/responses')
 export class ResponsesController {
@@ -65,6 +69,22 @@ export class ResponsesController {
     ): Promise<WebResponse<any>> {
         const result =
             await this.responsesService.findResponsesByUserId(userId);
+
+        return {
+            data: result,
+        };
+    }
+
+    @Patch()
+    @HttpCode(200)
+    async updateResponsesById(
+        @Body() request: ResponsesUpdateRequest,
+        @Admin() admin: User,
+    ): Promise<WebResponse<ResponsesResponse>> {
+        const result = await this.responsesService.updateUserResponse(
+            request,
+            admin,
+        );
 
         return {
             data: result,

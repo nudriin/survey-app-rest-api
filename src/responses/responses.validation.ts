@@ -8,4 +8,9 @@ export class ResponsesValidation {
     });
 
     static readonly FIND_ID = z.number().min(1);
+
+    static readonly UPDATE = z.object({
+        id: z.number().min(1),
+        select_option: z.number().min(1),
+    });
 }

@@ -24,3 +24,8 @@ export class ResponsesByUserResponse {
     select_option_text: string;
     question: QuestionResponse;
 }
+
+export class ResponsesUpdateRequest {
+    id: number;
+    select_option: number;
+}
