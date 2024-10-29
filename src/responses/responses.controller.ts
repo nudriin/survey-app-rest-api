@@ -1,4 +1,5 @@
 import {
+    ResponsesByUserResponse,
     ResponsesUpdateRequest,
     ResponsesWithQuestionResponse,
 } from './../model/responses.model';
@@ -69,7 +70,7 @@ export class ResponsesController {
     @HttpCode(200)
     async getResponsesByUserId(
         @Param('userId', ParseIntPipe) userId: number,
-    ): Promise<WebResponse<any>> {
+    ): Promise<WebResponse<ResponsesByUserResponse[]>> {
         const result =
             await this.responsesService.findResponsesByUserId(userId);
 
