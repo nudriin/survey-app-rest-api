@@ -86,6 +86,14 @@ export class ResponsesService {
             questionId,
         );
 
+        const findQuestion = await this.prismaService.question.findUnique({
+            where: {
+                id: validId,
+            },
+        });
+
+        if (!findQuestion) throw new HttpException('question not found', 404);
+
         const allResponses = await this.prismaService.response.findMany({
             where: {
                 question_id: validId,
