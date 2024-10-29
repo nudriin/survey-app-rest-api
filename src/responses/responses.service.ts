@@ -6,6 +6,7 @@ import {
     ResponsesResponse,
     ResponsesSaveRequest,
     ResponsesUpdateRequest,
+    ResponsesWithQuestionResponse,
 } from '../model/responses.model';
 import { ResponsesValidation } from './responses.validation';
 import { User } from '@prisma/client';
@@ -161,5 +162,19 @@ export class ResponsesService {
         });
 
         return responses;
+    }
+
+    async findAllResponsesAndQuestion(): Promise<
+        ResponsesWithQuestionResponse[]
+    > {
+        const data = await this.prismaService.question.findMany({
+            include: {
+                responses: true,
+            },
+        });
+
+        if (!data) throw new HttpException('responses not found', 404);
+
+        return data;
     }
 }

@@ -29,3 +29,15 @@ export class ResponsesUpdateRequest {
     id: number;
     select_option: number;
 }
+
+export class ResponsesWithQuestionResponse {
+    id: number;
+    question: string;
+    acronim: string;
+    option_1: string;
+    option_2: string;
+    option_3: string;
+    option_4: string;
+    status: boolean;
+    responses: Array<ResponsesResponse>;
+}

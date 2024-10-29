@@ -1,4 +1,7 @@
-import { ResponsesUpdateRequest } from './../model/responses.model';
+import {
+    ResponsesUpdateRequest,
+    ResponsesWithQuestionResponse,
+} from './../model/responses.model';
 import {
     Body,
     Controller,
@@ -85,6 +88,19 @@ export class ResponsesController {
             request,
             admin,
         );
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get()
+    @HttpCode(200)
+    async getAllResponsesAndQuestion(): Promise<
+        WebResponse<ResponsesWithQuestionResponse[]>
+    > {
+        const result =
+            await this.responsesService.findAllResponsesAndQuestion();
 
         return {
             data: result,
