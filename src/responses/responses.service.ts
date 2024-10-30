@@ -120,13 +120,13 @@ export class ResponsesService {
             userId,
         );
 
-        const findUser = await this.prismaService.user.findUnique({
+        const findResponden = await this.prismaService.responden.findUnique({
             where: {
                 id: validId,
             },
         });
 
-        if (!findUser) throw new HttpException('user not found', 404);
+        if (!findResponden) throw new HttpException('responden not found', 404);
 
         const userResponses = await this.prismaService.response.findMany({
             where: {
