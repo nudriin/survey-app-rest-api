@@ -94,4 +94,14 @@ export class RespondenController {
             data: result,
         };
     }
+
+    @Get('/count/total')
+    @HttpCode(200)
+    async countAllResponden(): Promise<WebResponse<number>> {
+        const result = await this.respondenService.countResponden();
+
+        return {
+            data: result,
+        };
+    }
 }

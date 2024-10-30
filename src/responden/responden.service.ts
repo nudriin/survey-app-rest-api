@@ -183,4 +183,13 @@ export class RespondenService {
 
         return 'OK';
     }
+
+    async countResponden(): Promise<number> {
+        const countResponden = await this.prismaService.responden.count();
+
+        if (countResponden == 0)
+            throw new HttpException('responden not found', 404);
+
+        return countResponden;
+    }
 }
