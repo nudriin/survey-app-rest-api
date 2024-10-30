@@ -34,3 +34,8 @@ export class RespondenResponse {
     service_type: string;
     gender: string;
 }
+
+export class RespondenCountResponseByGender {
+    total: number;
+    gender: string;
+}

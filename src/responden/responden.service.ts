@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/prisma.service';
 import { ValidationService } from '../common/validation.service';
 import {
+    RespondenCountResponseByGender,
     RespondenResponse,
     RespondenSaveRequest,
     RespondenUpdateRequest,
@@ -191,5 +192,26 @@ export class RespondenService {
             throw new HttpException('responden not found', 404);
 
         return countResponden;
+    }
+
+    async countRespondenGroupByGender(): Promise<
+        RespondenCountResponseByGender[]
+    > {
+        const countResponden = await this.prismaService.responden.groupBy({
+            by: ['gender'],
+            _count: {
+                _all: true,
+            },
+        });
+
+        if (countResponden.length == 0)
+            throw new HttpException('responden not found', 404);
+
+        return countResponden.map((val) => {
+            return {
+                total: val._count._all,
+                gender: val.gender,
+            };
+        });
     }
 }

@@ -16,6 +16,7 @@ import {
     RespondenSaveRequest,
     RespondenResponse,
     RespondenUpdateRequest,
+    RespondenCountResponseByGender,
 } from '../model/responden.model';
 import { WebResponse } from '../model/web.model';
 
@@ -99,6 +100,19 @@ export class RespondenController {
     @HttpCode(200)
     async countAllResponden(): Promise<WebResponse<number>> {
         const result = await this.respondenService.countResponden();
+
+        return {
+            data: result,
+        };
+    }
+
+    @Get('/count/total/gender')
+    @HttpCode(200)
+    async countAllRespondenGroupByGender(): Promise<
+        WebResponse<RespondenCountResponseByGender[]>
+    > {
+        const result =
+            await this.respondenService.countRespondenGroupByGender();
 
         return {
             data: result,
