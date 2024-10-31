@@ -3,10 +3,14 @@ import { ValidationService } from '../common/validation.service';
 import { PrismaService } from '../common/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UserRegisterRequest, UserResponse } from '../model/user.model';
+import {
+    AdminRegisterRequest,
+    UserRegisterRequest,
+    UserResponse,
+} from '../model/user.model';
 import { UserValidation } from './user.validation';
 import { UserLoginRequest } from '../model/user.model';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -104,6 +108,55 @@ export class UserService {
             email: user.email,
             name: user.name,
             role: user.role,
+        };
+    }
+
+    async adminAddUser(
+        user: User,
+        request: AdminRegisterRequest,
+    ): Promise<UserResponse> {
+        const validRequest: AdminRegisterRequest =
+            this.validationService.validate(
+                UserValidation.ADMIN_REGISTER,
+                request,
+            ) as AdminRegisterRequest;
+
+        const validUser = await this.prismaService.user.findUnique({
+            where: {
+                id: user.id,
+            },
+        });
+
+        if (!validUser) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
+        const totalUser = await this.prismaService.user.count({
+            where: {
+                email: validRequest.email,
+            },
+        });
+
+        if (totalUser != 0) {
+            throw new HttpException('user is exist', 400);
+        }
+
+        validRequest.password = await bcrypt.hash(validRequest.password, 10);
+
+        const createdUser = await this.prismaService.user.create({
+            data: {
+                name: validRequest.name,
+                email: validRequest.email,
+                password: validRequest.password,
+                role: validRequest.role as Role,
+            },
+        });
+
+        return {
+            id: createdUser.id,
+            email: createdUser.email,
+            name: createdUser.name,
+            role: createdUser.role,
         };
     }
 }

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { WebResponse } from '../model/web.model';
 import {
+    AdminRegisterRequest,
     UserLoginRequest,
     UserRegisterRequest,
     UserResponse,
@@ -8,6 +9,7 @@ import {
 import { UserService } from './user.service';
 import { User } from '@prisma/client';
 import { AuthUser } from '../common/auth-user.decorator';
+import { SuperAdmin } from '../common/super-admin.decorator';
 
 @Controller('/api/v1/users')
 export class UserController {
@@ -43,6 +45,18 @@ export class UserController {
     ): Promise<WebResponse<UserResponse>> {
         const result = await this.userService.findCurrent(user);
 
+        return {
+            data: result,
+        };
+    }
+
+    @Post('/admin/add')
+    @HttpCode(200)
+    async adminAddUser(
+        @SuperAdmin() superAdmin: User,
+        @Body() request: AdminRegisterRequest,
+    ): Promise<WebResponse<UserResponse>> {
+        const result = await this.userService.adminAddUser(superAdmin, request);
         return {
             data: result,
         };

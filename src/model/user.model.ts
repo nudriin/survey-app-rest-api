@@ -16,3 +16,10 @@ export class UserResponse {
     role: string;
     token?: string;
 }
+
+export class AdminRegisterRequest {
+    email: string;
+    password: string;
+    name: string;
+    role: string;
+}
