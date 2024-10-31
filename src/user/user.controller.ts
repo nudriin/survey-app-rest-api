@@ -61,4 +61,16 @@ export class UserController {
             data: result,
         };
     }
+
+    @Get()
+    @HttpCode(200)
+    async findAllUser(
+        @SuperAdmin() superAdmin: User,
+    ): Promise<WebResponse<UserResponse[]>> {
+        const result = await this.userService.findAllUsers(superAdmin);
+
+        return {
+            data: result,
+        };
+    }
 }
