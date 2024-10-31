@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    HttpCode,
+    Param,
+    ParseIntPipe,
+    Post,
+} from '@nestjs/common';
 import { WebResponse } from '../model/web.model';
 import {
     AdminRegisterRequest,
@@ -69,6 +78,18 @@ export class UserController {
     ): Promise<WebResponse<UserResponse[]>> {
         const result = await this.userService.findAllUsers(superAdmin);
 
+        return {
+            data: result,
+        };
+    }
+
+    @Delete('admin/:userId')
+    @HttpCode(200)
+    async adminDeleteUser(
+        @SuperAdmin() superAdmin: User,
+        @Param('userId', ParseIntPipe) userId: number,
+    ): Promise<WebResponse<string>> {
+        const result = await this.userService.removeUser(superAdmin, userId);
         return {
             data: result,
         };

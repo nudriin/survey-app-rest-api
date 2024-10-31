@@ -18,4 +18,6 @@ export class UserValidation {
         name: z.string().min(1).max(225),
         role: z.string().min(1).max(225),
     });
+
+    static readonly FIND_ID = z.number().min(1);
 }
