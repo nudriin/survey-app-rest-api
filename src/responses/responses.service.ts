@@ -10,12 +10,18 @@ import {
 } from '../model/responses.model';
 import { ResponsesValidation } from './responses.validation';
 import { User } from '@prisma/client';
+import * as XLSX from 'xlsx';
+import * as path from 'path';
+import * as fs from 'fs';
+import { EmailService } from '../common/email.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class ResponsesService {
     constructor(
         private prismaService: PrismaService,
         private validationService: ValidationService,
+        private emailService: EmailService,
     ) {}
 
     async saveResponses(
@@ -192,5 +198,196 @@ export class ResponsesService {
         if (!data) throw new HttpException('responses not found', 404);
 
         return data;
+    }
+
+    // @Cron('*/1 * * * *') // every 1 minutes
+    @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
+    async autoExportReport() {
+        const responsesQuestion = await this.findAllResponsesAndQuestion();
+
+        try {
+            // Responses Sheet
+            const responsesSheet = XLSX.utils.json_to_sheet(
+                responsesQuestion.map(
+                    (
+                        question: { responses: any[]; acronim: any },
+                        index: number,
+                    ) => {
+                        // Calculate NRR
+                        const nrr = (
+                            question.responses.reduce(
+                                (total: any, opt: { select_option: any }) =>
+                                    total + opt.select_option,
+                                0,
+                            ) / question.responses.length
+                        ).toFixed(3);
+
+                        // Determine the "Keterangan" based on NRR value
+                        let keterangan: string;
+                        const floatNRR = parseFloat(nrr);
+                        if (floatNRR >= 1.0 && floatNRR <= 2.5996) {
+                            keterangan = 'Tidak Baik';
+                        } else if (floatNRR >= 2.6 && floatNRR <= 3.064) {
+                            keterangan = 'Kurang Baik';
+                        } else if (floatNRR >= 3.0644 && floatNRR <= 3.532) {
+                            keterangan = 'Baik';
+                        } else {
+                            keterangan = 'Sangat Baik';
+                        }
+
+                        // Return data for each row in the sheet
+                        return {
+                            No: index + 1,
+                            'Unsur Pelayanan': question.acronim,
+                            NRR: nrr,
+                            Keterangan: keterangan,
+                        };
+                    },
+                ),
+            );
+
+            const resultTableData = [];
+
+            const headerRow = ['No'];
+            responsesQuestion.forEach((value: { acronim: string }) => {
+                headerRow.push(value.acronim);
+            });
+            resultTableData.push(headerRow);
+
+            // Populate each row of `select_option` values
+            responsesQuestion[0]?.responses.forEach((_, index) => {
+                const row = [index + 1];
+                responsesQuestion.forEach((question) => {
+                    row.push(question.responses[index].select_option);
+                });
+                resultTableData.push(row);
+            });
+
+            // Total row
+            const totalRow = ['Total'];
+            responsesQuestion.forEach((value) => {
+                const total = value.responses.reduce(
+                    (sum, opt) => sum + opt.select_option,
+                    0,
+                );
+                totalRow.push(total.toString());
+            });
+            resultTableData.push(totalRow);
+
+            // NRR/Unsur row
+            const nrrUnsurRow = ['NRR/Unsur'];
+            responsesQuestion.forEach((value) => {
+                const nrr = (
+                    value.responses.reduce(
+                        (sum, opt) => sum + opt.select_option,
+                        0,
+                    ) / value.responses.length
+                ).toFixed(3);
+                nrrUnsurRow.push(nrr);
+            });
+            resultTableData.push(nrrUnsurRow);
+
+            // NRR Tertimbang row
+            const nrrTertimbangRow = ['NRR Tertimbang'];
+            responsesQuestion.forEach((value) => {
+                const nrrTertimbang = (
+                    (value.responses.reduce(
+                        (sum, opt) => sum + opt.select_option,
+                        0,
+                    ) /
+                        value.responses.length) *
+                    0.111
+                ).toFixed(3);
+                nrrTertimbangRow.push(nrrTertimbang);
+            });
+            resultTableData.push(nrrTertimbangRow);
+
+            // IKM Unit Pelayanan row
+            const ikmUnitRow = ['IKM Unit Pelayanan'];
+            const ikmUnitValue = (
+                responsesQuestion.reduce((grandTotal, value) => {
+                    const nrrTertimbang =
+                        (value.responses.reduce(
+                            (sum, opt) => sum + opt.select_option,
+                            0,
+                        ) /
+                            value.responses.length) *
+                        0.111;
+                    return grandTotal + nrrTertimbang;
+                }, 0) * 25
+            ).toFixed(3);
+            ikmUnitRow.push(ikmUnitValue);
+            for (let i = 1; i < responsesQuestion.length; i++) {
+                ikmUnitRow.push('');
+            }
+            resultTableData.push(ikmUnitRow);
+
+            const resultTableSheet = XLSX.utils.aoa_to_sheet(resultTableData);
+            // NrrBarChart Sheet
+            const chartData = responsesQuestion.map((item, index) => {
+                const averageValue = (
+                    item.responses.reduce(
+                        (total, opt) => total + opt.select_option,
+                        0,
+                    ) / item.responses.length
+                ).toFixed(3);
+
+                return [`U${index + 1}`, averageValue];
+            });
+
+            const barChartSheetData = [
+                ['Label', 'Rata-rata Penilaian'],
+                ...chartData,
+            ];
+            const nrrBarChartSheet = XLSX.utils.aoa_to_sheet(barChartSheetData);
+            // Create workbook and append all sheets
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, responsesSheet, 'Responses');
+            XLSX.utils.book_append_sheet(
+                workbook,
+                resultTableSheet,
+                'ResultTable',
+            );
+            XLSX.utils.book_append_sheet(
+                workbook,
+                nrrBarChartSheet,
+                'NrrBarChart',
+            );
+
+            const tempDir = path.join(process.cwd(), 'temp');
+            if (!fs.existsSync(tempDir)) {
+                fs.mkdirSync(tempDir);
+            }
+
+            const fileName = `survei-report-${new Date().toISOString().split('T')[0]}.xlsx`;
+            const filePath = path.join(tempDir, fileName);
+
+            // Export the workbook to an .xlsx file
+            XLSX.writeFile(workbook, filePath);
+
+            const admins = await this.prismaService.user.findMany({
+                where: {
+                    role: 'SUPER_ADMIN',
+                },
+                select: {
+                    email: true,
+                },
+            });
+
+            if (admins.length !== 0) {
+                // throw new Error('No super admin found in the system');
+                const adminEmails = admins.map((admin) => admin.email);
+
+                // Send the email
+                //!  Send email
+                await this.emailService.sendReportEmail(adminEmails, filePath);
+            }
+
+            fs.unlinkSync(filePath);
+
+            console.log('Report generated and sent successfully');
+        } catch (error) {
+            console.error('Failed to generate and send report:', error);
+        }
     }
 }
