@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../src/common/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '@prisma/client';
+import { QuestionResponse } from '../src/model/question.model';
+import { RespondenResponse } from '../src/model/responden.model';
+import { ResponsesResponse } from '../src/model/responses.model';
 
 @Injectable()
 export class TestService {
@@ -123,5 +126,98 @@ export class TestService {
                 },
             });
         }
+    }
+
+    async deleteQuestion() {
+        const question = await this.prismaService.question.findFirst({
+            where: {
+                question: 'test',
+            },
+        });
+
+        if (question) {
+            await this.prismaService.response.deleteMany({
+                where: {
+                    question_id: question.id,
+                },
+            });
+
+            await this.prismaService.question.deleteMany({
+                where: {
+                    question: 'test',
+                },
+            });
+        }
+    }
+
+    async createQuestion(): Promise<QuestionResponse> {
+        const question = await this.prismaService.question.create({
+            data: {
+                question: 'test',
+                acronim: 'test',
+                option_1: 'test_option_1',
+                option_2: 'test_option_2',
+                option_3: 'test_option_3',
+                option_4: 'test_option_4',
+            },
+        });
+
+        return question;
+    }
+
+    async deleteResponden() {
+        const responden = await this.prismaService.responden.findFirst({
+            where: {
+                name: 'test',
+            },
+        });
+
+        if (responden) {
+            await this.prismaService.response.deleteMany({
+                where: {
+                    responden_id: responden.id,
+                },
+            });
+
+            await this.prismaService.responden.deleteMany({
+                where: {
+                    name: 'test',
+                },
+            });
+        }
+    }
+
+    async createResponden(): Promise<RespondenResponse> {
+        const responden = await this.prismaService.responden.create({
+            data: {
+                name: 'test',
+                email: 'test@test.com',
+                address: 'test',
+                phone: 'test',
+                age: 1,
+                education: 'test',
+                profession: 'test',
+                service_type: 'test',
+                gender: 'MALE',
+            },
+        });
+
+        return responden;
+    }
+
+    async createResponses(): Promise<ResponsesResponse> {
+        const question = await this.createQuestion();
+        const responden = await this.createResponden();
+
+        const responses = await this.prismaService.response.create({
+            data: {
+                question_id: question.id,
+                responden_id: responden.id,
+                select_option: 1,
+                select_option_text: question.option_1,
+            },
+        });
+
+        return responses;
     }
 }

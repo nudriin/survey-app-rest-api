@@ -87,4 +87,30 @@ export class EmailService {
             throw error;
         }
     }
+
+    async sendReportEmail(toEmails: string[], filePath: string) {
+        const date = new Date().toLocaleDateString('id-ID', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+        });
+
+        await this.sendEmail({
+            to: toEmails,
+            subject: `Laporan SKM - ${date}`,
+            text: `Laporan Survei Kepuasan Masyarakat untuk tanggal ${date} terlampir.`,
+            html: `
+            <h2>Laporan SKM</h2>
+            <p>Halo,</p>
+            <p>Berikut terlampir laporan Survei Kepuasan Masyarakat untuk tanggal ${date}.</p>
+            <p>Best regards,<br>Sistem Laporan</p>
+            `,
+            attachments: [
+                {
+                    filename: path.basename(filePath),
+                    path: filePath,
+                },
+            ],
+        });
+    }
 }
