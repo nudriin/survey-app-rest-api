@@ -29,9 +29,9 @@ export class RespondenService {
         const responden = await this.prismaService.responden.create({
             data: {
                 name: validRequest.name,
-                email: validRequest.email,
-                address: validRequest.address,
-                phone: validRequest.phone,
+                email: validRequest.email || '-',
+                address: validRequest.address || '-',
+                phone: validRequest.phone || '-',
                 age: validRequest.age,
                 education: validRequest.education,
                 profession: validRequest.profession,
