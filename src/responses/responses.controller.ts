@@ -107,4 +107,17 @@ export class ResponsesController {
             data: result,
         };
     }
+
+    @Get('/semester')
+    @HttpCode(200)
+    async getAllResponsesAndQuestionThisSemester(): Promise<
+        WebResponse<ResponsesWithQuestionResponse[]>
+    > {
+        const result =
+            await this.responsesService.findAllResponsesAndQuestionThisSemester();
+
+        return {
+            data: result,
+        };
+    }
 }

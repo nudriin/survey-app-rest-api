@@ -15,14 +15,21 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { EmailService } from '../common/email.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { toZonedTime } from 'date-fns-tz';
+import { subMonths } from 'date-fns';
 
 @Injectable()
 export class ResponsesService {
+    private timeZone = 'Asia/Jakarta';
     constructor(
         private prismaService: PrismaService,
         private validationService: ValidationService,
         private emailService: EmailService,
     ) {}
+
+    private getZonedDate(): Date {
+        return toZonedTime(new Date(), this.timeZone);
+    }
 
     async saveResponses(
         request: ResponsesSaveRequest,
@@ -192,6 +199,31 @@ export class ResponsesService {
         const data = await this.prismaService.question.findMany({
             include: {
                 responses: true,
+            },
+        });
+
+        if (!data) throw new HttpException('responses not found', 404);
+
+        return data;
+    }
+
+    async findAllResponsesAndQuestionThisSemester(): Promise<
+        ResponsesWithQuestionResponse[]
+    > {
+        const now = this.getZonedDate();
+        const semesterEnd = now;
+        const semesterStart = subMonths(semesterEnd, 6);
+
+        const data = await this.prismaService.question.findMany({
+            include: {
+                responses: {
+                    where: {
+                        created_at: {
+                            gte: semesterStart,
+                            lte: semesterEnd,
+                        },
+                    },
+                },
             },
         });
 
