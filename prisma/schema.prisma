@@ -88,6 +88,7 @@ model Responden {
   education    String     @db.VarChar(225)
   profession   String     @db.VarChar(225)
   service_type String     @db.VarChar(225)
+  suggestions  String?    @db.Text
   gender       Gender
   responses    Response[]
 
