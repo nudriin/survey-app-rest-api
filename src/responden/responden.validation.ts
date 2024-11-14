@@ -10,6 +10,7 @@ export class RespondenValidation {
         education: z.string().min(1).max(255),
         profession: z.string().min(1).max(255),
         service_type: z.string().min(1).max(255),
+        suggestions: z.string().min(1),
         gender: z.string().min(1).max(255),
     });
 
@@ -25,6 +26,7 @@ export class RespondenValidation {
         education: z.string().min(1).max(225).optional(),
         profession: z.string().min(1).max(225).optional(),
         service_type: z.string().min(1).max(225).optional(),
+        suggestions: z.string().min(1).optional(),
         gender: z.string().min(1).max(225).optional(),
     });
 }

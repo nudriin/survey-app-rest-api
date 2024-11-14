@@ -7,6 +7,7 @@ export class RespondenSaveRequest {
     education: string;
     profession: string;
     service_type: string;
+    suggestions?: string;
     gender: string;
 }
 export class RespondenUpdateRequest {
@@ -19,6 +20,7 @@ export class RespondenUpdateRequest {
     education?: string;
     profession?: string;
     service_type?: string;
+    suggestions?: string;
     gender?: string;
 }
 
@@ -32,6 +34,7 @@ export class RespondenResponse {
     education: string;
     profession: string;
     service_type: string;
+    suggestions?: string;
     gender: string;
 }
 

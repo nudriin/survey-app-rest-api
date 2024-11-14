@@ -36,6 +36,7 @@ export class RespondenService {
                 education: validRequest.education,
                 profession: validRequest.profession,
                 service_type: validRequest.service_type,
+                suggestions: validRequest.suggestions,
                 gender: validRequest.gender as Gender,
             },
         });
@@ -128,6 +129,8 @@ export class RespondenService {
             responden.profession = validRequest.profession;
         if (validRequest.service_type)
             responden.service_type = validRequest.service_type;
+        if (validRequest.suggestions)
+            responden.suggestions = validRequest.suggestions;
         if (validRequest.gender)
             responden.gender = validRequest.gender as Gender;
 
