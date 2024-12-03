@@ -16,7 +16,7 @@ import * as fs from 'fs';
 import { EmailService } from '../common/email.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { toZonedTime } from 'date-fns-tz';
-import { subMonths } from 'date-fns';
+import { addDays, subMonths } from 'date-fns';
 
 @Injectable()
 export class ResponsesService {
@@ -211,7 +211,7 @@ export class ResponsesService {
         ResponsesWithQuestionResponse[]
     > {
         const now = this.getZonedDate();
-        const semesterEnd = now;
+        const semesterEnd = addDays(now, 1);
         const semesterStart = subMonths(semesterEnd, 6);
 
         const data = await this.prismaService.question.findMany({
