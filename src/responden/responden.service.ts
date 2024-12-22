@@ -72,20 +72,49 @@ export class RespondenService {
         return responden;
     }
 
-    async findAllResponden(user: User): Promise<RespondenResponse[]> {
+    async findAllResponden(
+        user: User,
+        skip: number,
+        take: number,
+        search: string = '',
+    ): Promise<{ data: RespondenResponse[]; total: number }> {
         const userCount = await this.prismaService.user.count({
             where: {
                 id: user.id,
             },
         });
 
-        if (userCount == 0) throw new HttpException('Unauthorized', 401);
+        if (userCount === 0) throw new HttpException('Unauthorized', 401);
 
-        const respondens = await this.prismaService.responden.findMany();
+        const where = search
+            ? {
+                  OR: [
+                      { name: { contains: search } },
+                      { phone: { contains: search } },
+                      { profession: { contains: search } },
+                      { education: { contains: search } },
+                      {
+                          service_type: {
+                              contains: search,
+                          },
+                      },
+                  ],
+              }
+            : {};
 
-        if (!respondens) throw new HttpException('responden not found', 404);
+        const total = await this.prismaService.responden.count({
+            where,
+        });
 
-        return respondens;
+        const respondens = await this.prismaService.responden.findMany({
+            where,
+            skip,
+            take,
+        });
+
+        if (!respondens) throw new HttpException('Responden not found', 404);
+
+        return { data: respondens, total };
     }
 
     async updateRespondenData(

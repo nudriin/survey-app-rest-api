@@ -8,6 +8,7 @@ import {
     ParseIntPipe,
     Patch,
     Post,
+    Query,
 } from '@nestjs/common';
 import { RespondenService } from './responden.service';
 import { Admin } from '../common/admin.decorator';
@@ -56,8 +57,19 @@ export class RespondenController {
     @HttpCode(200)
     async getAllResponden(
         @Admin() admin: User,
-    ): Promise<WebResponse<RespondenResponse[]>> {
-        const result = await this.respondenService.findAllResponden(admin);
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+        @Query('search') search: string = '',
+    ): Promise<WebResponse<{ data: RespondenResponse[]; total: number }>> {
+        const skip = (page - 1) * limit;
+        const take = limit;
+
+        const result = await this.respondenService.findAllResponden(
+            admin,
+            skip,
+            take,
+            search,
+        );
 
         return {
             data: result,
