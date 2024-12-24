@@ -213,6 +213,21 @@ export class UserService {
             throw new HttpException('user not found', 404);
         }
 
+        const forms = await this.prismaService.form.findMany({
+            where: { userId },
+            select: { id: true },
+        });
+
+        const formIds = forms.map((form) => form.id);
+
+        await this.prismaService.formDetails.deleteMany({
+            where: { formId: { in: formIds } },
+        });
+
+        await this.prismaService.form.deleteMany({
+            where: { userId },
+        });
+
         await this.prismaService.user.delete({
             where: {
                 id: validId,
