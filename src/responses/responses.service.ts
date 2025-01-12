@@ -236,6 +236,9 @@ export class ResponsesService {
     @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
     async autoExportReport() {
         const responsesQuestion = await this.findAllResponsesAndQuestion();
+        responsesQuestion.forEach((val) => {
+            console.log(val.responses);
+        });
 
         try {
             // Responses Sheet
@@ -246,13 +249,18 @@ export class ResponsesService {
                         index: number,
                     ) => {
                         // Calculate NRR
-                        const nrr = (
-                            question.responses.reduce(
-                                (total: any, opt: { select_option: any }) =>
-                                    total + opt.select_option,
-                                0,
-                            ) / question.responses.length
-                        ).toFixed(3);
+                        const nrr =
+                            question.responses.length > 0
+                                ? (
+                                      question.responses.reduce(
+                                          (
+                                              total: any,
+                                              opt: { select_option: any },
+                                          ) => total + (opt.select_option ?? 4),
+                                          0,
+                                      ) / question.responses.length
+                                  ).toFixed(3)
+                                : '0.000';
 
                         // Determine the "Keterangan" based on NRR value
                         let keterangan: string;
@@ -290,7 +298,9 @@ export class ResponsesService {
             responsesQuestion[0]?.responses.forEach((_, index) => {
                 const row = [index + 1];
                 responsesQuestion.forEach((question) => {
-                    row.push(question.responses[index].select_option);
+                    const selectOption =
+                        question.responses[index]?.select_option ?? 4;
+                    row.push(selectOption);
                 });
                 resultTableData.push(row);
             });
@@ -309,12 +319,15 @@ export class ResponsesService {
             // NRR/Unsur row
             const nrrUnsurRow = ['NRR/Unsur'];
             responsesQuestion.forEach((value) => {
-                const nrr = (
-                    value.responses.reduce(
-                        (sum, opt) => sum + opt.select_option,
-                        0,
-                    ) / value.responses.length
-                ).toFixed(3);
+                const nrr =
+                    value.responses.length > 0
+                        ? (
+                              value.responses.reduce(
+                                  (sum, opt) => sum + opt.select_option,
+                                  0,
+                              ) / value.responses.length
+                          ).toFixed(3)
+                        : '0.000';
                 nrrUnsurRow.push(nrr);
             });
             resultTableData.push(nrrUnsurRow);
@@ -322,14 +335,17 @@ export class ResponsesService {
             // NRR Tertimbang row
             const nrrTertimbangRow = ['NRR Tertimbang'];
             responsesQuestion.forEach((value) => {
-                const nrrTertimbang = (
-                    (value.responses.reduce(
-                        (sum, opt) => sum + opt.select_option,
-                        0,
-                    ) /
-                        value.responses.length) *
-                    0.111
-                ).toFixed(3);
+                const nrrTertimbang =
+                    value.responses.length > 0
+                        ? (
+                              (value.responses.reduce(
+                                  (sum, opt) => sum + opt.select_option,
+                                  0,
+                              ) /
+                                  value.responses.length) *
+                              0.111
+                          ).toFixed(3)
+                        : '0.000';
                 nrrTertimbangRow.push(nrrTertimbang);
             });
             resultTableData.push(nrrTertimbangRow);
@@ -338,6 +354,10 @@ export class ResponsesService {
             const ikmUnitRow = ['IKM Unit Pelayanan'];
             const ikmUnitValue = (
                 responsesQuestion.reduce((grandTotal, value) => {
+                    if (value.responses.length === 0) {
+                        return grandTotal;
+                    }
+
                     const nrrTertimbang =
                         (value.responses.reduce(
                             (sum, opt) => sum + opt.select_option,
@@ -357,12 +377,15 @@ export class ResponsesService {
             const resultTableSheet = XLSX.utils.aoa_to_sheet(resultTableData);
             // NrrBarChart Sheet
             const chartData = responsesQuestion.map((item, index) => {
-                const averageValue = (
-                    item.responses.reduce(
-                        (total, opt) => total + opt.select_option,
-                        0,
-                    ) / item.responses.length
-                ).toFixed(3);
+                const averageValue =
+                    item.responses.length > 0
+                        ? (
+                              item.responses.reduce(
+                                  (total, opt) => total + opt.select_option,
+                                  0,
+                              ) / item.responses.length
+                          ).toFixed(3)
+                        : '0.000';
 
                 return [`U${index + 1}`, averageValue];
             });
